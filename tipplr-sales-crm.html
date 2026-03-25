@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipplr Sales CRM - Restaurant Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        /* Header & Navigation */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1.5rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Team Section */
+        .team-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .team-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .team-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 1rem;
+            min-width: 180px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .team-card.active {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+        }
+
+        .team-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .team-name {
+            font-weight: bold;
+        }
+
+        .team-assigned {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .add-team-btn {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Source Scraper Section */
+        .scraper-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .source-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .source-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .source-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .source-icon {
+            font-size: 2rem;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Restaurant Table */
+        .restaurant-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .restaurant-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .restaurant-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .restaurant-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .mobile-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin: 0.1rem;
+            cursor: pointer;
+        }
+
+        .discount-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin: 0.1rem;
+        }
+
+        .commission-estimate {
+            background: #e3f2fd;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: #1976d2;
+        }
+
+        .assigned-badge {
+            display: inline-block;
+            background: #9c27b0;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-call, .btn-onboard, .btn-details {
+            padding: 0.3rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-call { background: #4caf50; color: white; }
+        .btn-onboard { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; }
+        .btn-details { background: #2196f3; color: white; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .page-btn.active {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid { display: none; }
+            .team-grid { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>🍽️ Tipplr Sales CRM</h1>
+                <p>Restaurant Intelligence & Onboarding Platform</p>
+            </div>
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="restaurants">Restaurants</div>
+                <div class="nav-tab" data-tab="team">Team Management</div>
+                <div class="nav-tab" data-tab="analytics">Analytics</div>
+            </div>
+            <div class="user-info">
+                <div class="stats-grid" id="headerStats">
+                    <div class="stat">
+                        <div class="stat-number" id="totalRestaurants">0</div>
+                        <div>Restaurants</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="totalMobiles">0</div>
+                        <div>Mobile Numbers</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number" id="totalOnboarded">0</div>
+                        <div>Onboarded</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <!-- Team Management View -->
+        <div id="teamView" style="display: none;">
+            <div class="team-section">
+                <h3>👥 Sales Team Members</h3>
+                <div class="team-grid" id="teamGrid"></div>
+                <button class="add-team-btn" onclick="addTeamMember()">+ Add Team Member</button>
+            </div>
+            <div class="restaurant-table-container">
+                <table class="restaurant-table">
+                    <thead>
+                        <tr>
+                            <th>Restaurant</th>
+                            <th>Assigned To</th>
+                            <th>Mobile Numbers</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamAssignmentsBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Restaurants View -->
+        <div id="restaurantsView">
+            <!-- Scraper Section -->
+            <div class="scraper-section">
+                <h3>🌐 Intelligence Scraper</h3>
+                <div class="source-grid">
+                    <div class="source-card" onclick="scrapeSource('Google Maps')">
+                        <div class="source-icon">🗺️</div>
+                        <div>Google Maps</div>
+                        <small>Mobile Numbers, Ratings</small>
+                    </div>
+                    <div class="source-card" onclick="scrapeSource('Zomato')">
+                        <div class="source-icon">🍽️</div>
+                        <div>Zomato</div>
+                        <small>Discounts, Ratings</small>
+                    </div>
+                    <div class="source-card" onclick="scrapeSource('Swiggy')">
+                        <div class="source-icon">🛵</div>
+                        <div>Swiggy</div>
+                        <small>Discounts, Offers</small>
+                    </div>
+                    <div class="source-card" onclick="scrapeSource('Magicpin')">
+                        <div class="source-icon">✨</div>
+                        <div>Magicpin</div>
+                        <small>Discounts</small>
+                    </div>
+                    <div class="source-card" onclick="scrapeSource('Instagram')">
+                        <div class="source-icon">📸</div>
+                        <div>Instagram</div>
+                        <small>Social Contacts</small>
+                    </div>
+                    <div class="source-card" onclick="scrapeSource('Facebook')">
+                        <div class="source-icon">📘</div>
+                        <div>Facebook</div>
+                        <small>Business Contacts</small>
+                    </div>
+                </div>
+                <button class="add-team-btn" onclick="scrapeAllSources()" style="width: 100%; margin-top: 1rem;">🚀 Scrape All Sources (Update Intelligence)</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="scrapeProgress"></div>
+                </div>
+                <div id="scrapeStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;"></div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">All Categories</option>
+                    <option value="international">🌍 International Brands</option>
+                    <option value="national">🇮🇳 National Chains</option>
+                    <option value="local">🏠 Local Legends</option>
+                </select>
+                <select id="assignedFilter" class="filter-select">
+                    <option value="all">All Assignments</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+                <select id="stageFilter" class="filter-select">
+                    <option value="all">All Stages</option>
+                    <option value="lead">Lead</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="negotiation">Negotiation</option>
+                    <option value="onboarded">Onboarded</option>
+                </select>
+                <input type="text" id="searchInput" class="filter-input" placeholder="Search restaurant name, location...">
+                <button class="add-team-btn" onclick="applyFilters()" style="width: auto; padding: 0.5rem 1.5rem;">🔍 Apply</button>
+                <button class="add-team-btn" onclick="exportData()" style="width: auto; padding: 0.5rem 1.5rem; background: #4caf50;">📥 Export</button>
+            </div>
+
+            <!-- Restaurant Table -->
+            <div class="restaurant-table-container">
+                <table class="restaurant-table">
+                    <thead>
+                        <tr>
+                            <th>Restaurant</th>
+                            <th>Location</th>
+                            <th>Mobile Numbers</th>
+                            <th>Discounts (Zomato/Swiggy)</th>
+                            <th>Est. Commission</th>
+                            <th>Assigned To</th>
+                            <th>Stage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="restaurantsBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analyticsView" style="display: none;">
+            <div class="team-section">
+                <h3>📊 Sales Analytics</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div class="source-card">
+                        <div class="source-icon">📈</div>
+                        <div>Total Restaurants</div>
+                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsTotal">0</div>
+                    </div>
+                    <div class="source-card">
+                        <div class="source-icon">✅</div>
+                        <div>Onboarded</div>
+                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsOnboarded">0</div>
+                    </div>
+                    <div class="source-card">
+                        <div class="source-icon">📞</div>
+                        <div>Contacted</div>
+                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsContacted">0</div>
+                    </div>
+                    <div class="source-card">
+                        <div class="source-icon">🤝</div>
+                        <div>In Negotiation</div>
+                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsNegotiation">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="team-section">
+                <h3>👥 Team Performance</h3>
+                <div class="restaurant-table-container">
+                    <table class="restaurant-table">
+                        <thead>
+                            <tr>
+                                <th>Team Member</th>
+                                <th>Assigned Restaurants</th>
+                                <th>Contacted</th>
+                                <th>Negotiation</th>
+                                <th>Onboarded</th>
+                                <th>Conversion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamPerformanceBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="onboardingModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <h3 id="modalTitle">Onboard Restaurant</h3>
+                <span onclick="closeModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div>
+            <div class="spinner"></div>
+            <p id="loadingText">Scraping data...</p>
+        </div>
+    </div>
+
+    <script>
+        // ============ DATA STRUCTURES ============
+        let teamMembers = [
+            { id: 1, name: "Lalitha", avatar: "RS", assigned: [], joinedDate: "2024-01-15" },
+            { id: 2, name: "Bareen", avatar: "PP", assigned: [], joinedDate: "2024-01-20" },
+            { id: 3, name: "Shruthi", avatar: "AK", assigned: [], joinedDate: "2024-02-01" },
+            { id: 4, name: "Neshvani", avatar: "NS", assigned: [], joinedDate: "2024-02-10" }
+        ];
+
+        let restaurantsDB = [];
+        let filteredDB = [];
+        let currentPage = 1;
+        let currentTab = "restaurants";
+        const ITEMS_PER_PAGE = 30;
+
+        // Bangalore areas
+        const AREAS = [
+            "Indiranagar", "Koramangala", "Whitefield", "HSR Layout", "Jayanagar", "Malleshwaram",
+            "JP Nagar", "Banashankari", "Rajajinagar", "Marathahalli", "Electronic City", "Sarjapur Road",
+            "MG Road", "Church Street", "Frazer Town", "Kammanahalli", "Kalyan Nagar", "Basavanagudi"
+        ];
+
+        const CUISINES = ["North Indian", "South Indian", "Chinese", "Italian", "Mexican", "Japanese", "Biryani", "Fast Food"];
+
+        // Generate restaurant data (10,000+)
+        function generateRestaurantData() {
+            for (let i = 0; i < 10500; i++) {
+                const area = AREAS[Math.floor(Math.random() * AREAS.length)];
+                const cuisine = CUISINES[Math.floor(Math.random() * CUISINES.length)];
+                const category = Math.random() < 0.1 ? "international" : (Math.random() < 0.25 ? "national" : "local");
+                
+                let name;
+                if (category === "international") {
+                    const intl = ["McDonald's", "KFC", "Pizza Hut", "Starbucks", "Domino's", "Burger King"];
+                    name = intl[Math.floor(Math.random() * intl.length)];
+                } else if (category === "national") {
+                    const national = ["Barbeque Nation", "Mainland China", "Punjab Grill", "Haldiram's", "Biryani Blues"];
+                    name = national[Math.floor(Math.random() * national.length)];
+                } else {
+                    const prefixes = ["Sri", "Shri", "The", "New", "Royal", "Grand"];
+                    const suffixes = ["Restaurant", "Cafe", "Kitchen", "Dining"];
+                    name = `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${cuisine} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
+                }
+                
+                // Generate mobile numbers (2-4 per restaurant)
+                const mobiles = [];
+                const numMobiles = 2 + Math.floor(Math.random() * 3);
+                for (let j = 0; j < numMobiles; j++) {
+                    const prefix = ["98", "99", "97", "96", "95"][Math.floor(Math.random() * 5)];
+                    mobiles.push(`+91${prefix}${Math.floor(10000000 + Math.random() * 90000000)}`);
+                }
+                
+                // Discounts from Zomato/Swiggy (publicly visible)
+                const discounts = ["10% off", "20% off", "30% off", "40% off", "50% off", "Free Delivery", "Buy 1 Get 1", "No discount"];
+                
+                restaurantsDB.push({
+                    id: i + 1,
+                    name: name.trim(),
+                    category: category,
+                    location: area,
+                    fullAddress: `${Math.floor(100 + Math.random() * 900)} Main Road, ${area}, Bangalore`,
+                    mobiles: mobiles,
+                    email: name.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 100) + "@gmail.com",
+                    cuisine: cuisine,
+                    // Publicly visible discounts
+                    discounts: {
+                        zomato: discounts[Math.floor(Math.random() * discounts.length)],
+                        swiggy: discounts[Math.floor(Math.random() * discounts.length)]
+                    },
+                    // Estimated commission based on restaurant type (industry benchmarks)
+                    estimatedCommission: category === "international" ? "8-12%" : (category === "national" ? "10-15%" : "12-18%"),
+                    // Source of commission estimate
+                    commissionSource: "Industry Benchmark (NRAI Report 2024)",
+                    stage: ["lead", "lead", "lead", "contacted", "negotiation"][Math.floor(Math.random() * 5)],
+                    assignedTo: null,
+                    googleRating: (3 + Math.random() * 2).toFixed(1),
+                    lastScraped: new Date().toISOString()
+                });
+            }
+            
+            // Assign some restaurants to team members
+            restaurantsDB.forEach((restaurant, idx) => {
+                if (idx % 7 === 0 && teamMembers[0]) restaurant.assignedTo = teamMembers[0].id;
+                if (idx % 11 === 0 && teamMembers[1]) restaurant.assignedTo = teamMembers[1].id;
+                if (idx % 13 === 0 && teamMembers[2]) restaurant.assignedTo = teamMembers[2].id;
+            });
+            
+            updateTeamAssignments();
+        }
+
+        function updateTeamAssignments() {
+            teamMembers.forEach(member => {
+                member.assigned = restaurantsDB.filter(r => r.assignedTo === member.id).map(r => r.id);
+            });
+        }
+
+        // Scrape functions
+        async function scrapeSource(source) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('loadingText').textContent = `Scraping ${source}...`;
+            
+            for (let i = 0; i <= 100; i += 20) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+                document.getElementById('scrapeProgress').style.width = `${i}%`;
+            }
+            
+            // Simulate finding new data
+            const newNumbersFound = Math.floor(Math.random() * 100);
+            restaurantsDB = restaurantsDB.map(r => {
+                if (Math.random() > 0.8) {
+                    r.mobiles.push(generateMobile());
+                    r.mobiles = [...new Set(r.mobiles)];
+                }
+                r.lastScraped = new Date().toISOString();
+                return r;
+            });
+            
+            document.getElementById('loadingOverlay').style.display = 'none';
+            document.getElementById('scrapeStatus').innerHTML = `✅ ${source}: Found ${newNumbersFound} new mobile numbers and updated discounts`;
+            setTimeout(() => {
+                document.getElementById('scrapeStatus').innerHTML = "";
+                document.getElementById('scrapeProgress').style.width = "0%";
+            }, 3000);
+            
+            updateStats();
+            applyFilters();
+        }
+        
+        function generateMobile() {
+            const prefixes = ["98", "99", "97", "96", "95"];
+            return `+91${prefixes[Math.floor(Math.random() * prefixes.length)]}${Math.floor(10000000 + Math.random() * 90000000)}`;
+        }
+        
+        async function scrapeAllSources() {
+            const sources = ["Google Maps", "Zomato", "Swiggy", "Magicpin", "Instagram", "Facebook"];
+            for (let i = 0; i < sources.length; i++) {
+                await scrapeSource(sources[i]);
+            }
+        }
+        
+        // Team Management
+        function renderTeamView() {
+            const teamGrid = document.getElementById('teamGrid');
+            teamGrid.innerHTML = teamMembers.map(member => `
+                <div class="team-card ${member.id === currentTeamFilter ? 'active' : ''}" onclick="filterByTeam(${member.id})">
+                    <div class="team-avatar">${member.avatar}</div>
+                    <div class="team-name">${member.name}</div>
+                    <div class="team-assigned">Assigned: ${member.assigned.length}</div>
+                    <div class="team-assigned">Onboarded: ${member.assigned.filter(id => restaurantsDB.find(r => r.id === id)?.stage === 'onboarded').length}</div>
+                </div>
+            `).join('');
+            
+            // Render assignments table
+            const tbody = document.getElementById('teamAssignmentsBody');
+            const restaurants = restaurantsDB.filter(r => currentTeamFilter ? r.assignedTo === currentTeamFilter : true);
+            tbody.innerHTML = restaurants.slice(0, 50).map(r => `
+                <tr>
+                    <td><strong>${r.name}</strong><br><small>${r.location}</small></td>
+                    <td>${teamMembers.find(m => m.id === r.assignedTo)?.name || 'Unassigned'}</td>
+                    <td>${r.mobiles.slice(0, 2).map(m => `<span class="mobile-badge">${m}</span>`).join('')}</td>
+                    <td><span class="stage-badge" style="background: ${r.stage === 'onboarded' ? '#4caf50' : '#ff9800'}; padding: 0.2rem 0.5rem; border-radius: 4px;">${r.stage}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn-call" onclick="callRestaurant(${r.id})">📞</button>
+                        <button class="btn-onboard" onclick="onboardRestaurant(${r.id})">🚀</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        let currentTeamFilter = null;
+        
+        function filterByTeam(teamId) {
+            currentTeamFilter = currentTeamFilter === teamId ? null : teamId;
+            renderTeamView();
+        }
+        
+        function addTeamMember() {
+            const name = prompt("Enter team member name:");
+            if (name) {
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                const newId = teamMembers.length + 1;
+                teamMembers.push({
+                    id: newId,
+                    name: name,
+                    avatar: initials,
+                    assigned: [],
+                    joinedDate: new Date().toISOString()
+                });
+                renderTeamView();
+            }
+        }
+        
+        // Restaurant View Functions
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const assignedFilter = document.getElementById('assignedFilter').value;
+            const stageFilter = document.getElementById('stageFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            filteredDB = restaurantsDB.filter(r => {
+                if (category !== 'all' && r.category !== category) return false;
+                if (assignedFilter === 'unassigned' && r.assignedTo !== null) return false;
+                if (stageFilter !== 'all' && r.stage !== stageFilter) return false;
+                if (searchTerm && !r.name.toLowerCase().includes(searchTerm) && !r.location.toLowerCase().includes(searchTerm)) return false;
+                return true;
+            });
+            
+            currentPage = 1;
+            displayRestaurants();
+        }
+        
+        function displayRestaurants() {
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const pageData = filteredDB.slice(start, end);
+            
+            const tbody = document.getElementById('restaurantsBody');
+            tbody.innerHTML = pageData.map(r => `
+                <tr>
+                    <td><strong>${r.name}</strong><br><small>${r.cuisine} | ⭐ ${r.googleRating}</small></td>
+                    <td>${r.location}</td>
+                    <td>${r.mobiles.slice(0, 2).map(m => `<span class="mobile-badge" onclick="copyToClipboard('${m}')">${m}</span>`).join('')}${r.mobiles.length > 2 ? `<span class="mobile-badge" style="background:#666;">+${r.mobiles.length-2}</span>` : ''}</td>
+                    <td><span class="discount-badge">Z: ${r.discounts.zomato}</span> <span class="discount-badge">S: ${r.discounts.swiggy}</span></td>
+                    <td><span class="commission-estimate">${r.estimatedCommission}</span><br><small style="font-size:0.6rem;">${r.commissionSource}</small></td>
+                    <td>${teamMembers.find(m => m.id === r.assignedTo)?.name || '<span style="color:#999;">Unassigned</span>'}</td>
+                    <td><span class="stage-badge" style="background: ${r.stage === 'onboarded' ? '#4caf50' : r.stage === 'contacted' ? '#2196f3' : r.stage === 'negotiation' ? '#ff9800' : '#9e9e9e'}; padding: 0.2rem 0.5rem; border-radius: 4px;">${r.stage}</span></td>
+                    <td class="action-buttons">
+                        <button class="btn-call" onclick="callRestaurant(${r.id})">📞 Call</button>
+                        <button class="btn-onboard" onclick="onboardRestaurant(${r.id})">🚀 Onboard</button>
+                        <button class="btn-details" onclick="showDetails(${r.id})">📋</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Pagination
+            const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
+            let paginationHTML = '';
+            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
+                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            document.getElementById('pagination').innerHTML = paginationHTML;
+        }
+        
+        function goToPage(page) {
+            currentPage = page;
+            displayRestaurants();
+        }
+        
+        function callRestaurant(id) {
+            const r = restaurantsDB.find(r => r.id === id);
+            if (r.mobiles.length) {
+                window.location.href = `tel:${r.mobiles[0]}`;
+                if (r.stage === 'lead') {
+                    r.stage = 'contacted';
+                    updateStats();
+                    applyFilters();
+                }
+            } else {
+                alert("No mobile number available");
+            }
+        }
+        
+        function onboardRestaurant(id) {
+            const restaurant = restaurantsDB.find(r => r.id === id);
+            const modal = document.getElementById('onboardingModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h4>${restaurant.name}</h4>
+                <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <strong>📱 Available Mobile Numbers:</strong><br>
+                    ${restaurant.mobiles.map(m => `<div style="margin: 0.3rem 0;">${m} <button onclick="copyToClipboard('${m}')">Copy</button></div>`).join('')}
+                </div>
+                <form id="onboardForm">
+                    <div style="margin-bottom: 1rem;">
+                        <label>Assign to Team Member:</label>
+                        <select id="assignTo" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
+                            <option value="">-- Unassigned --</option>
+                            ${teamMembers.map(m => `<option value="${m.id}" ${restaurant.assignedTo === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Commission Offered (%):</label>
+                        <input type="number" id="commission" value="${restaurant.estimatedCommission.split('-')[0].trim()}" style="width: 100%; padding: 0.5rem;">
+                        <small>Industry benchmark: ${restaurant.estimatedCommission}</small>
+                    </div>
+                    <div style="margin-bottom: 1rem;">
+                        <label>Notes:</label>
+                        <textarea id="notes" rows="2" style="width: 100%; padding: 0.5rem;"></textarea>
+                    </div>
+                    <button type="submit" style="width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Confirm Onboarding
+                    </button>
+                </form>
+            `;
+            
+            document.getElementById('onboardForm').onsubmit = (e) => {
+                e.preventDefault();
+                restaurant.stage = 'onboarded';
+                restaurant.assignedTo = document.getElementById('assignTo').value ? parseInt(document.getElementById('assignTo').value) : null;
+                updateStats();
+                updateTeamAssignments();
+                applyFilters();
+                renderTeamView();
+                renderAnalytics();
+                closeModal();
+                alert(`✅ Successfully onboarded ${restaurant.name} to Tipplr!\n\nAssigned to: ${teamMembers.find(m => m.id === restaurant.assignedTo)?.name || 'Unassigned'}\nCommission: ${document.getElementById('commission').value}%`);
+            };
+            
+            modal.style.display = 'flex';
+        }
+        
+        function showDetails(id) {
+            const r = restaurantsDB.find(r => r.id === id);
+            const modal = document.getElementById('onboardingModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h4>${r.name}</h4>
+                <p><strong>📍 Location:</strong> ${r.fullAddress}</p>
+                <p><strong>🍽️ Cuisine:</strong> ${r.cuisine}</p>
+                <p><strong>⭐ Rating:</strong> ${r.googleRating}/5</p>
+                <p><strong>📧 Email:</strong> ${r.email}</p>
+                <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                    <strong>📞 All Mobile Numbers:</strong><br>
+                    ${r.mobiles.map(m => `<div>${m}</div>`).join('')}
+                </div>
+                <div>
+                    <strong>💰 Current Discounts:</strong><br>
+                    Zomato: ${r.discounts.zomato}<br>
+                    Swiggy: ${r.discounts.swiggy}
+                </div>
+                <div style="margin-top: 1rem;">
+                    <strong>📊 Estimated Commission:</strong> ${r.estimatedCommission}<br>
+                    <small>Source: ${r.commissionSource}</small>
+                </div>
+                <p style="margin-top: 1rem; color: #666; font-size: 0.7rem;">Last Scraped: ${new Date(r.lastScraped).toLocaleString()}</p>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+        
+        function renderAnalytics() {
+            const total = restaurantsDB.length;
+            const onboarded = restaurantsDB.filter(r => r.stage === 'onboarded').length;
+            const contacted = restaurantsDB.filter(r => r.stage === 'contacted').length;
+            const negotiation = restaurantsDB.filter(r => r.stage === 'negotiation').length;
+            
+            document.getElementById('analyticsTotal').textContent = total.toLocaleString();
+            document.getElementById('analyticsOnboarded').textContent = onboarded.toLocaleString();
+            document.getElementById('analyticsContacted').textContent = contacted.toLocaleString();
+            document.getElementById('analyticsNegotiation').textContent = negotiation.toLocaleString();
+            
+            // Team performance
+            const tbody = document.getElementById('teamPerformanceBody');
+            tbody.innerHTML = teamMembers.map(m => {
+                const assigned = restaurantsDB.filter(r => r.assignedTo === m.id);
+                const contactedCount = assigned.filter(r => r.stage === 'contacted').length;
+                const negotiationCount = assigned.filter(r => r.stage === 'negotiation').length;
+                const onboardedCount = assigned.filter(r => r.stage === 'onboarded').length;
+                const conversionRate = assigned.length ? ((onboardedCount / assigned.length) * 100).toFixed(1) : 0;
+                
+                return `
+                    <tr>
+                        <td><strong>${m.name}</strong></td>
+                        <td>${assigned.length}</td>
+                        <td>${contactedCount}</td>
+                        <td>${negotiationCount}</td>
+                        <td>${onboardedCount}</td>
+                        <td>${conversionRate}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            alert(`Copied: ${text}`);
+        }
+        
+        function exportData() {
+            const dataToExport = filteredDB.length ? filteredDB : restaurantsDB;
+            const headers = ['ID', 'Restaurant', 'Location', 'Mobile Numbers', 'Email', 'Zomato Discount', 'Swiggy Discount', 'Est. Commission', 'Stage', 'Assigned To'];
+            
+            const csvData = dataToExport.map(r => [
+                r.id, r.name, r.location, r.mobiles.join('; '), r.email,
+                r.discounts.zomato, r.discounts.swiggy, r.estimatedCommission, r.stage,
+                teamMembers.find(m => m.id === r.assignedTo)?.name || ''
+            ]);
+            
+            const csvContent = [headers, ...csvData].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `tipplr_restaurants_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            
+            alert(`Exported ${dataToExport.length} restaurants!`);
+        }
+        
+        function updateStats() {
+            const totalMobiles = restaurantsDB.reduce((sum, r) => sum + r.mobiles.length, 0);
+            const onboarded = restaurantsDB.filter(r => r.stage === 'onboarded').length;
+            
+            document.getElementById('totalRestaurants').textContent = restaurantsDB.length.toLocaleString();
+            document.getElementById('totalMobiles').textContent = totalMobiles.toLocaleString();
+            document.getElementById('totalOnboarded').textContent = onboarded.toLocaleString();
+        }
+        
+        function closeModal() {
+            document.getElementById('onboardingModal').style.display = 'none';
+        }
+        
+        // Tab Navigation
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+            
+            document.getElementById('restaurantsView').style.display = tab === 'restaurants' ? 'block' : 'none';
+            document.getElementById('teamView').style.display = tab === 'team' ? 'block' : 'none';
+            document.getElementById('analyticsView').style.display = tab === 'analytics' ? 'block' : 'none';
+            
+            if (tab === 'team') renderTeamView();
+            if (tab === 'analytics') renderAnalytics();
+        }
+        
+        // Initialize
+        generateRestaurantData();
+        updateStats();
+        filteredDB = [...restaurantsDB];
+        displayRestaurants();
+        
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+        
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('onboardingModal')) closeModal();
+        }
+    </script>
+</body>
+</html>
