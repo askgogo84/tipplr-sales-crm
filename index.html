@@ -3,46 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tipplr Sales CRM - Google Drive Integrated Document Management</title>
+    <title>Tipplr CRM - Google Drive Working</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f5f5;
         }
-
-        /* Header & Navigation */
         .header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
+            padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
-
         .header-content {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            gap: 1rem;
         }
-
         .logo h1 {
             font-size: 1.5rem;
             background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .drive-status {
             display: flex;
             align-items: center;
@@ -50,162 +44,90 @@
             background: rgba(255,255,255,0.1);
             padding: 0.3rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.8rem;
         }
-
-        .drive-connected {
-            color: #4caf50;
-        }
-
-        .drive-disconnected {
-            color: #ff6b6b;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 1rem;
-            background: rgba(255,255,255,0.1);
-            padding: 0.5rem;
-            border-radius: 12px;
-        }
-
-        .nav-tab {
-            padding: 0.5rem 1.5rem;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .nav-tab.active {
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .stats-grid {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ff6b6b;
-        }
-
-        /* Main Container */
+        .drive-connected { color: #4caf50; }
+        .drive-disconnected { color: #ff6b6b; }
         .container {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
-
-        /* Team Section */
-        .team-section {
+        .setup-card {
             background: white;
             border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 2rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .team-grid {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .team-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
             padding: 1rem;
-            min-width: 180px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            margin: 1rem 0;
+            border-radius: 8px;
         }
-
-        .team-card.active {
-            border-color: #ff6b6b;
-            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
         }
-
-        .team-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.5rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-        }
-
-        .team-name {
-            font-weight: bold;
-        }
-
-        .team-assigned {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .add-team-btn {
+        .btn-primary {
             background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
             color: white;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 1rem;
+            font-weight: bold;
         }
-
-        /* Source Scraper Section */
-        .scraper-section {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+        .btn-secondary {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
         }
-
-        .source-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .source-card {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        .upload-area {
+            border: 2px dashed #ddd;
             border-radius: 12px;
-            padding: 1rem;
+            padding: 2rem;
             text-align: center;
+            margin: 1rem 0;
             cursor: pointer;
             transition: all 0.3s;
         }
-
-        .source-card:hover {
+        .upload-area:hover {
+            border-color: #ff6b6b;
+            background: #f8f9fa;
+        }
+        .restaurant-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .restaurant-card:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
-        .source-icon {
-            font-size: 2rem;
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
         }
-
-        /* Filters */
+        .doc-badge {
+            background: #9c27b0;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            display: inline-block;
+        }
         .filters-bar {
             background: white;
             border-radius: 16px;
@@ -216,128 +138,12 @@
             flex-wrap: wrap;
             align-items: center;
         }
-
-        .filter-select, .filter-input {
-            padding: 0.5rem 1rem;
+        .filter-input {
+            flex: 1;
+            padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 8px;
         }
-
-        .filter-input {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        /* Restaurant Table */
-        .restaurant-table-container {
-            background: white;
-            border-radius: 16px;
-            overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .restaurant-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
-        }
-
-        .restaurant-table th {
-            background: #f8f9fa;
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-
-        .restaurant-table td {
-            padding: 1rem;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
-        }
-
-        .mobile-badge {
-            display: inline-block;
-            background: #4caf50;
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin: 0.1rem;
-            cursor: pointer;
-        }
-
-        .discount-badge {
-            display: inline-block;
-            background: #ff9800;
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin: 0.1rem;
-        }
-
-        .commission-estimate {
-            background: #e3f2fd;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            color: #1976d2;
-        }
-
-        .doc-badge {
-            display: inline-block;
-            background: #9c27b0;
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin: 0.1rem;
-            cursor: pointer;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .btn-call, .btn-onboard, .btn-details, .btn-docs {
-            padding: 0.3rem 0.8rem;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-
-        .btn-call { background: #4caf50; color: white; }
-        .btn-onboard { background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; }
-        .btn-details { background: #2196f3; color: white; }
-        .btn-docs { background: #9c27b0; color: white; }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .page-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .page-btn.active {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -350,17 +156,15 @@
             justify-content: center;
             align-items: center;
         }
-
         .modal-content {
             background: white;
             border-radius: 16px;
             padding: 2rem;
-            max-width: 700px;
+            max-width: 600px;
             width: 90%;
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -369,99 +173,39 @@
             padding-bottom: 0.5rem;
             border-bottom: 2px solid #f0f0f0;
         }
-
-        .close-modal {
-            cursor: pointer;
-            font-size: 1.5rem;
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
         }
-
-        /* Upload Area */
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin: 1rem 0;
-            cursor: pointer;
-            transition: all 0.3s;
+        .progress-fill {
+            height: 100%;
+            background: #4caf50;
+            width: 0%;
+            transition: width 0.3s;
         }
-
-        .upload-area:hover {
-            border-color: #ff6b6b;
-            background: #f8f9fa;
-        }
-
         .document-card {
             background: #f8f9fa;
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            margin: 0.3rem 0;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
-        .doc-type-badge {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            margin-left: 0.5rem;
+        .url-box {
+            background: #f0f0f0;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+            margin: 0.5rem 0;
         }
-
-        .type-agreement { background: #4caf50; color: white; }
-        .type-pan { background: #ff9800; color: white; }
-        .type-gst { background: #2196f3; color: white; }
-        .type-license { background: #9c27b0; color: white; }
-        .type-other { background: #607d8b; color: white; }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            color: white;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 1rem;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
         @media (max-width: 768px) {
-            .stats-grid { display: none; }
-            .team-grid { flex-direction: column; }
+            .restaurants-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -470,1243 +214,465 @@
         <div class="header-content">
             <div class="logo">
                 <h1>🍽️ Tipplr Sales CRM</h1>
-                <p>Google Drive Integrated Document Management</p>
+                <p>Google Drive Document Management</p>
             </div>
             <div class="drive-status" id="driveStatus">
                 <span>📁 Google Drive:</span>
                 <span id="driveStatusText" class="drive-disconnected">Not Connected</span>
-                <button id="driveAuthBtn" onclick="connectGoogleDrive()" style="background: none; border: 1px solid white; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; cursor: pointer;">Connect</button>
-            </div>
-            <div class="nav-tabs">
-                <div class="nav-tab active" data-tab="restaurants">Restaurants</div>
-                <div class="nav-tab" data-tab="team">Team Management</div>
-                <div class="nav-tab" data-tab="documents">Documents</div>
-                <div class="nav-tab" data-tab="analytics">Analytics</div>
-            </div>
-            <div class="user-info">
-                <div class="stats-grid" id="headerStats">
-                    <div class="stat">
-                        <div class="stat-number" id="totalRestaurants">0</div>
-                        <div>Restaurants</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number" id="totalMobiles">0</div>
-                        <div>Mobile Numbers</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number" id="totalDocuments">0</div>
-                        <div>Documents</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number" id="totalOnboarded">0</div>
-                        <div>Onboarded</div>
-                    </div>
-                </div>
+                <button id="connectBtn" class="btn-primary" style="background: none; border: 1px solid white; padding: 0.2rem 0.8rem;">Connect</button>
             </div>
         </div>
     </div>
 
-    <div class="container" id="mainContainer">
-        <!-- Team Management View -->
-        <div id="teamView" style="display: none;">
-            <div class="team-section">
-                <h3>👥 Sales Team Members</h3>
-                <div class="team-grid" id="teamGrid"></div>
-                <button class="add-team-btn" onclick="addTeamMember()">+ Add Team Member</button>
-            </div>
-            <div class="restaurant-table-container">
-                <table class="restaurant-table">
-                    <thead>
-                        <tr>
-                            <th>Restaurant</th>
-                            <th>Assigned To</th>
-                            <th>Mobile Numbers</th>
-                            <th>Documents</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="teamAssignmentsBody"></tbody>
-                </table>
+    <div class="container">
+        <!-- Server Info Card -->
+        <div class="setup-card" id="serverInfo">
+            <h3>🌐 Server Information</h3>
+            <div class="url-box" id="serverUrlDisplay"></div>
+            <div class="success-box" id="serverStatus">
+                ✅ Running on local server - OAuth will work!
             </div>
         </div>
 
-        <!-- Documents View -->
-        <div id="documentsView" style="display: none;">
-            <div class="filters-bar">
-                <select id="docTypeFilter" class="filter-select">
-                    <option value="all">All Document Types</option>
-                    <option value="agreement">📄 Agreement/Contract</option>
-                    <option value="pan">🆔 PAN Card</option>
-                    <option value="gst">🏭 GST Certificate</option>
-                    <option value="license">✅ FSSAI License</option>
-                    <option value="other">📎 Other Documents</option>
-                </select>
-                <input type="text" id="docSearchInput" class="filter-input" placeholder="Search by restaurant name...">
-                <button class="add-team-btn" onclick="filterDocuments()" style="width: auto;">🔍 Search</button>
+        <!-- Setup Instructions -->
+        <div id="setupCard" class="setup-card">
+            <h3>🔐 Google Drive Setup</h3>
+            <div style="margin-bottom: 1rem;">
+                <label><strong>Your Google Client ID:</strong></label>
+                <input type="text" id="clientIdInput" value="20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; border: 1px solid #ddd; border-radius: 8px;">
+                <button id="saveAndConnect" class="btn-primary" style="width: 100%;">Connect to Google Drive</button>
             </div>
-            <div id="documentsGrid" class="restaurant-table-container">
-                <table class="restaurant-table">
-                    <thead>
-                        <tr>
-                            <th>Restaurant</th>
-                            <th>Location</th>
-                            <th>Documents</th>
-                            <th>Uploaded By</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="documentsBody"></tbody>
-                </table>
+            
+            <div class="warning-box">
+                ⚠️ <strong>Important:</strong> Make sure you've added this URL to Google Cloud Console:
+                <br><br>
+                <strong>Authorized JavaScript Origins:</strong><br>
+                <code id="originUrl"></code>
+                <br><br>
+                <strong>Authorized Redirect URIs:</strong><br>
+                <code id="redirectUrl"></code>
             </div>
         </div>
 
-        <!-- Restaurants View -->
-        <div id="restaurantsView">
-            <!-- Scraper Section -->
-            <div class="scraper-section">
-                <h3>🌐 Intelligence Scraper</h3>
-                <div class="source-grid">
-                    <div class="source-card" onclick="scrapeSource('Google Maps')">
-                        <div class="source-icon">🗺️</div>
-                        <div>Google Maps</div>
-                        <small>Mobile Numbers, Ratings</small>
-                    </div>
-                    <div class="source-card" onclick="scrapeSource('Zomato')">
-                        <div class="source-icon">🍽️</div>
-                        <div>Zomato</div>
-                        <small>Discounts, Ratings</small>
-                    </div>
-                    <div class="source-card" onclick="scrapeSource('Swiggy')">
-                        <div class="source-icon">🛵</div>
-                        <div>Swiggy</div>
-                        <small>Discounts, Offers</small>
-                    </div>
-                    <div class="source-card" onclick="scrapeSource('Magicpin')">
-                        <div class="source-icon">✨</div>
-                        <div>Magicpin</div>
-                        <small>Discounts</small>
-                    </div>
-                    <div class="source-card" onclick="scrapeSource('Instagram')">
-                        <div class="source-icon">📸</div>
-                        <div>Instagram</div>
-                        <small>Social Contacts</small>
-                    </div>
-                    <div class="source-card" onclick="scrapeSource('Facebook')">
-                        <div class="source-icon">📘</div>
-                        <div>Facebook</div>
-                        <small>Business Contacts</small>
-                    </div>
-                </div>
-                <button class="add-team-btn" onclick="scrapeAllSources()" style="width: 100%; margin-top: 1rem;">🚀 Scrape All Sources (Update Intelligence)</button>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="scrapeProgress"></div>
-                </div>
-                <div id="scrapeStatus" style="margin-top: 0.5rem; font-size: 0.8rem; color: #666;"></div>
-            </div>
-
-            <!-- Filters -->
-            <div class="filters-bar">
-                <select id="categoryFilter" class="filter-select">
-                    <option value="all">All Categories</option>
-                    <option value="international">🌍 International Brands</option>
-                    <option value="national">🇮🇳 National Chains</option>
-                    <option value="local">🏠 Local Legends</option>
-                </select>
-                <select id="assignedFilter" class="filter-select">
-                    <option value="all">All Assignments</option>
-                    <option value="unassigned">Unassigned</option>
-                </select>
-                <select id="stageFilter" class="filter-select">
-                    <option value="all">All Stages</option>
-                    <option value="lead">Lead</option>
-                    <option value="contacted">Contacted</option>
-                    <option value="negotiation">Negotiation</option>
-                    <option value="onboarded">Onboarded</option>
-                </select>
-                <select id="docStatusFilter" class="filter-select">
-                    <option value="all">All Documents</option>
-                    <option value="has">Has Documents</option>
-                    <option value="no">No Documents</option>
-                </select>
-                <input type="text" id="searchInput" class="filter-input" placeholder="Search restaurant name, location...">
-                <button class="add-team-btn" onclick="applyFilters()" style="width: auto; padding: 0.5rem 1.5rem;">🔍 Apply</button>
-                <button class="add-team-btn" onclick="exportData()" style="width: auto; padding: 0.5rem 1.5rem; background: #4caf50;">📥 Export</button>
-            </div>
-
-            <!-- Restaurant Table -->
-            <div class="restaurant-table-container">
-                <table class="restaurant-table">
-                    <thead>
-                        <tr>
-                            <th>Restaurant</th>
-                            <th>Location</th>
-                            <th>Mobile Numbers</th>
-                            <th>Discounts (Zomato/Swiggy)</th>
-                            <th>Est. Commission</th>
-                            <th>Documents</th>
-                            <th>Assigned To</th>
-                            <th>Stage</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="restaurantsBody"></tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination" id="pagination"></div>
+        <!-- Search Bar -->
+        <div class="filters-bar">
+            <input type="text" id="searchInput" class="filter-input" placeholder="Search restaurant by name or location...">
+            <button onclick="searchRestaurants()" class="btn-primary">🔍 Search</button>
         </div>
 
-        <!-- Analytics View -->
-        <div id="analyticsView" style="display: none;">
-            <div class="team-section">
-                <h3>📊 Sales Analytics</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div class="source-card">
-                        <div class="source-icon">📈</div>
-                        <div>Total Restaurants</div>
-                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsTotal">0</div>
-                    </div>
-                    <div class="source-card">
-                        <div class="source-icon">✅</div>
-                        <div>Onboarded</div>
-                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsOnboarded">0</div>
-                    </div>
-                    <div class="source-card">
-                        <div class="source-icon">📞</div>
-                        <div>Contacted</div>
-                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsContacted">0</div>
-                    </div>
-                    <div class="source-card">
-                        <div class="source-icon">🤝</div>
-                        <div>In Negotiation</div>
-                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsNegotiation">0</div>
-                    </div>
-                    <div class="source-card">
-                        <div class="source-icon">📄</div>
-                        <div>Total Documents</div>
-                        <div style="font-size: 2rem; font-weight: bold;" id="analyticsDocuments">0</div>
-                    </div>
-                </div>
-            </div>
-            <div class="team-section">
-                <h3>👥 Team Performance</h3>
-                <div class="restaurant-table-container">
-                    <table class="restaurant-table">
-                        <thead>
-                            <tr>
-                                <th>Team Member</th>
-                                <th>Assigned Restaurants</th>
-                                <th>Contacted</th>
-                                <th>Negotiation</th>
-                                <th>Onboarded</th>
-                                <th>Documents Uploaded</th>
-                                <th>Conversion Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teamPerformanceBody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+        <!-- Restaurants Grid -->
+        <div id="restaurantsGrid" class="restaurants-grid"></div>
     </div>
 
     <!-- Document Manager Modal -->
-    <div id="docManagerModal" class="modal">
+    <div id="docModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="docModalTitle">Document Manager</h3>
-                <span class="close-modal" onclick="closeModal('docManagerModal')">&times;</span>
+                <h3 id="modalTitle">Document Manager</h3>
+                <span onclick="closeModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
             </div>
-            <div id="docManagerContent"></div>
+            <div id="modalContent"></div>
         </div>
     </div>
 
-    <!-- Onboarding Modal -->
-    <div id="onboardingModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Onboard Restaurant</h3>
-                <span class="close-modal" onclick="closeModal('onboardingModal')">&times;</span>
-            </div>
-            <div id="onboardingContent"></div>
-        </div>
-    </div>
-
-    <!-- Details Modal -->
-    <div id="detailsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Restaurant Details</h3>
-                <span class="close-modal" onclick="closeModal('detailsModal')">&times;</span>
-            </div>
-            <div id="detailsContent"></div>
-        </div>
-    </div>
-
-    <div id="loadingOverlay" class="loading-overlay">
-        <div>
-            <div class="spinner"></div>
-            <p id="loadingText">Processing...</p>
-        </div>
-    </div>
-
-    <script src="https://apis.google.com/js/api.js"></script>
     <script>
-        // ============ GOOGLE DRIVE CONFIGURATION ============
-        const GOOGLE_CLIENT_ID = "20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com";
-        const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata";
+        // ============ CONFIGURATION ============
+        const DEFAULT_CLIENT_ID = "20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com";
+        const SCOPES = "https://www.googleapis.com/auth/drive.file";
         
-        let gapiInitialized = false;
-        let tokenClient = null;
-        let isDriveConnected = false;
+        // State
+        let accessToken = null;
+        let isConnected = false;
         let driveFolderId = null;
-        let currentRestaurantId = null;
-
-        // Initialize Google Drive
-        function initGoogleDriveAPI() {
-            return new Promise((resolve, reject) => {
-                if (typeof gapi === 'undefined') {
-                    reject('Google API not loaded');
-                    return;
-                }
-                
-                gapi.load('client', async () => {
-                    try {
-                        await gapi.client.init({
-                            clientId: GOOGLE_CLIENT_ID,
-                            scope: SCOPES,
-                            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-                        });
-                        
-                        gapiInitialized = true;
-                        console.log('Google Drive API initialized');
-                        
-                        // Check if already signed in
-                        const token = gapi.client.getToken();
-                        if (token) {
-                            isDriveConnected = true;
-                            updateDriveStatus(true);
-                            await createTipplrFolder();
-                        }
-                        resolve();
-                    } catch (error) {
-                        console.error('Error initializing Google Drive:', error);
-                        reject(error);
-                    }
-                });
-            });
+        let restaurants = [];
+        
+        // Get current URL
+        const currentOrigin = window.location.origin;
+        const currentUrl = window.location.href;
+        
+        // Display URLs
+        document.getElementById('serverUrlDisplay').innerHTML = `<strong>Current URL:</strong> ${currentUrl}`;
+        document.getElementById('originUrl').textContent = currentOrigin;
+        document.getElementById('redirectUrl').textContent = currentOrigin + '/';
+        
+        // Check if running from file://
+        if (window.location.protocol === 'file:') {
+            document.getElementById('serverStatus').innerHTML = '❌ ERROR: You are opening this file directly (file://). Please run a local server!<br><br>Run this command in terminal: <code>python -m http.server 8000</code><br>Then open: <code>http://localhost:8000</code>';
+            document.getElementById('serverStatus').className = 'warning-box';
+            document.getElementById('connectBtn').disabled = true;
+            document.getElementById('saveAndConnect').disabled = true;
         }
-
-        function connectGoogleDrive() {
-            if (!gapiInitialized) {
-                initGoogleDriveAPI().then(() => {
-                    requestAccessToken();
-                }).catch(() => {
-                    alert('Please refresh the page and try again');
-                });
-            } else {
-                requestAccessToken();
+        
+        // ============ GOOGLE DRIVE CONNECTION (MODERN GIS) ============
+        let tokenClient = null;
+        
+        async function connectToGoogleDrive() {
+            const clientId = document.getElementById('clientIdInput').value;
+            if (!clientId) {
+                alert('Please enter your Google Client ID');
+                return;
             }
-        }
-
-        function requestAccessToken() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: GOOGLE_CLIENT_ID,
-                scope: SCOPES,
-                callback: async (tokenResponse) => {
-                    gapi.client.setToken(tokenResponse);
-                    isDriveConnected = true;
-                    updateDriveStatus(true);
-                    await createTipplrFolder();
-                    alert('✅ Successfully connected to Google Drive!');
-                    
-                    // Refresh current document manager if open
-                    if (currentRestaurantId) {
-                        openDocumentManager(currentRestaurantId);
-                    }
-                },
-                error_callback: (error) => {
-                    console.error('Auth error:', error);
-                    alert('Failed to connect to Google Drive. Please try again.');
-                }
-            });
-            tokenClient.requestAccessToken();
-        }
-
-        function disconnectGoogleDrive() {
-            const token = gapi.client.getToken();
-            if (token) {
-                google.accounts.oauth2.revoke(token.access_token);
-                gapi.client.setToken(null);
+            
+            if (window.location.protocol === 'file:') {
+                alert('Cannot connect from file:// protocol. Please run a local server first!\n\nRun: python -m http.server 8000\nThen open: http://localhost:8000');
+                return;
             }
-            isDriveConnected = false;
-            updateDriveStatus(false);
-            alert('Disconnected from Google Drive');
-        }
-
-        function updateDriveStatus(connected) {
-            const statusText = document.getElementById('driveStatusText');
-            const authBtn = document.getElementById('driveAuthBtn');
-            if (connected) {
-                statusText.textContent = 'Connected ✓';
-                statusText.className = 'drive-connected';
-                authBtn.textContent = 'Disconnect';
-                authBtn.onclick = disconnectGoogleDrive;
-            } else {
-                statusText.textContent = 'Not Connected';
-                statusText.className = 'drive-disconnected';
-                authBtn.textContent = 'Connect';
-                authBtn.onclick = connectGoogleDrive;
-            }
-        }
-
-        async function createTipplrFolder() {
-            if (!isDriveConnected) return;
             
             try {
-                // Check if folder already exists
-                const response = await gapi.client.drive.files.list({
-                    q: "name='Tipplr_Restaurant_Documents' and mimeType='application/vnd.google-apps.folder' and trashed=false",
-                    fields: 'files(id, name)'
+                // Load GIS if not loaded
+                if (typeof google === 'undefined' || !google.accounts) {
+                    await loadGIS();
+                }
+                
+                // Create token client
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: SCOPES,
+                    callback: async (tokenResponse) => {
+                        console.log('Token received');
+                        accessToken = tokenResponse.access_token;
+                        isConnected = true;
+                        updateUI(true);
+                        await createDriveFolder();
+                        alert('✅ Successfully connected to Google Drive!');
+                        document.getElementById('setupCard').style.display = 'none';
+                    },
+                    error_callback: (error) => {
+                        console.error('Auth error:', error);
+                        let errorMsg = 'Connection failed: ';
+                        if (error.type === 'popup_closed') {
+                            errorMsg += 'Popup was closed. Please try again.';
+                        } else if (error.type === 'access_denied') {
+                            errorMsg += 'Access denied. Please allow access.';
+                        } else {
+                            errorMsg += error.message || 'Unknown error';
+                        }
+                        alert(errorMsg);
+                        updateUI(false);
+                    }
                 });
                 
-                if (response.result.files.length > 0) {
-                    driveFolderId = response.result.files[0].id;
-                } else {
-                    // Create new folder
-                    const fileMetadata = {
-                        name: 'Tipplr_Restaurant_Documents',
-                        mimeType: 'application/vnd.google-apps.folder'
-                    };
-                    const folder = await gapi.client.drive.files.create({
-                        resource: fileMetadata,
-                        fields: 'id'
-                    });
-                    driveFolderId = folder.result.id;
-                }
-                console.log('Google Drive folder ready:', driveFolderId);
+                // Request access token
+                tokenClient.requestAccessToken();
+                
             } catch (error) {
-                console.error('Error creating folder:', error);
+                console.error('Connection error:', error);
+                alert('Failed to connect: ' + error.message);
+                updateUI(false);
             }
         }
-
-        async function uploadToGoogleDrive(file, restaurantId, restaurantName, docType) {
-            if (!isDriveConnected) {
-                alert('Please connect to Google Drive first (click "Connect" in top bar)');
-                return null;
-            }
-
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.style.display = 'flex';
-            document.getElementById('loadingText').textContent = `Uploading to Google Drive: ${file.name}`;
-
+        
+        function loadGIS() {
+            return new Promise((resolve, reject) => {
+                if (typeof google !== 'undefined' && google.accounts) {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://accounts.google.com/gsi/client';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function createDriveFolder() {
+            if (!accessToken) return;
+            
             try {
-                // Create restaurant subfolder (sanitize name for folder)
-                const sanitizedName = restaurantName.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
-                const restaurantFolderName = `${restaurantId}_${sanitizedName}`;
+                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?q=name=\'Tipplr_Restaurant_Documents\' and mimeType=\'application/vnd.google-apps.folder\' and trashed=false&fields=files(id,name)', {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const searchData = await searchRes.json();
+                
+                if (searchData.files && searchData.files.length > 0) {
+                    driveFolderId = searchData.files[0].id;
+                } else {
+                    const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: 'Tipplr_Restaurant_Documents',
+                            mimeType: 'application/vnd.google-apps.folder'
+                        })
+                    });
+                    const folderData = await createRes.json();
+                    driveFolderId = folderData.id;
+                }
+            } catch (error) {
+                console.error('Folder error:', error);
+            }
+        }
+        
+        async function uploadToDrive(file, restaurantName, docType) {
+            if (!accessToken) return null;
+            
+            try {
+                const folderName = restaurantName.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
                 let restaurantFolderId = null;
                 
-                // Check if restaurant folder exists
-                const folderCheck = await gapi.client.drive.files.list({
-                    q: `name='${restaurantFolderName}' and '${driveFolderId}' in parents and trashed=false`,
-                    fields: 'files(id, name)'
+                const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${folderName}' and '${driveFolderId}' in parents and trashed=false&fields=files(id)`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
+                const searchData = await searchRes.json();
                 
-                if (folderCheck.result.files.length > 0) {
-                    restaurantFolderId = folderCheck.result.files[0].id;
+                if (searchData.files && searchData.files.length > 0) {
+                    restaurantFolderId = searchData.files[0].id;
                 } else {
-                    // Create restaurant folder
-                    const folderMetadata = {
-                        name: restaurantFolderName,
-                        mimeType: 'application/vnd.google-apps.folder',
-                        parents: [driveFolderId]
-                    };
-                    const newFolder = await gapi.client.drive.files.create({
-                        resource: folderMetadata,
-                        fields: 'id'
+                    const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: folderName,
+                            mimeType: 'application/vnd.google-apps.folder',
+                            parents: [driveFolderId]
+                        })
                     });
-                    restaurantFolderId = newFolder.result.id;
+                    const folderData = await createRes.json();
+                    restaurantFolderId = folderData.id;
                 }
                 
-                // Upload file with progress tracking
                 const fileName = `${docType}_${file.name}`;
-                const metadata = {
+                const formData = new FormData();
+                formData.append('metadata', new Blob([JSON.stringify({
                     name: fileName,
                     parents: [restaurantFolderId]
-                };
+                })], { type: 'application/json' }));
+                formData.append('file', file);
                 
-                const form = new FormData();
-                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-                form.append('file', file);
-                
-                const accessToken = gapi.client.getToken().access_token;
-                
-                // Upload with progress tracking
-                const xhr = new XMLHttpRequest();
-                const uploadPromise = new Promise((resolve, reject) => {
-                    xhr.open('POST', 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
-                    xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-                    
-                    xhr.upload.onprogress = (event) => {
-                        if (event.lengthComputable) {
-                            const percent = (event.loaded / event.total) * 100;
-                            const progressFill = document.getElementById('uploadProgressFill');
-                            if (progressFill) progressFill.style.width = `${percent}%`;
-                        }
-                    };
-                    
-                    xhr.onload = () => {
-                        if (xhr.status === 200) {
-                            resolve(JSON.parse(xhr.responseText));
-                        } else {
-                            reject(new Error(`Upload failed: ${xhr.status}`));
-                        }
-                    };
-                    
-                    xhr.onerror = () => reject(new Error('Upload failed'));
-                    xhr.send(form);
+                const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}` },
+                    body: formData
                 });
                 
-                const data = await uploadPromise;
-                
-                loadingOverlay.style.display = 'none';
+                const fileData = await uploadRes.json();
                 return {
-                    fileId: data.id,
-                    webViewLink: `https://drive.google.com/file/d/${data.id}/view`,
-                    webContentLink: `https://drive.google.com/uc?id=${data.id}&export=download`,
+                    fileId: fileData.id,
+                    url: `https://drive.google.com/file/d/${fileData.id}/view`,
                     name: fileName
                 };
             } catch (error) {
                 console.error('Upload error:', error);
-                loadingOverlay.style.display = 'none';
-                alert('Error uploading to Google Drive: ' + error.message);
                 return null;
             }
         }
-
-        async function deleteFromGoogleDrive(fileId) {
-            if (!isDriveConnected || !fileId) return false;
+        
+        function disconnectDrive() {
+            if (tokenClient && accessToken) {
+                google.accounts.oauth2.revoke(accessToken, () => {});
+            }
+            accessToken = null;
+            isConnected = false;
+            updateUI(false);
+            document.getElementById('setupCard').style.display = 'block';
+            alert('Disconnected from Google Drive');
+        }
+        
+        function updateUI(connected) {
+            const statusText = document.getElementById('driveStatusText');
+            const connectBtn = document.getElementById('connectBtn');
             
-            try {
-                await gapi.client.drive.files.delete({ fileId: fileId });
-                return true;
-            } catch (error) {
-                console.error('Delete error:', error);
-                return false;
+            if (connected) {
+                statusText.textContent = 'Connected ✓';
+                statusText.className = 'drive-connected';
+                connectBtn.textContent = 'Disconnect';
+                connectBtn.onclick = disconnectDrive;
+            } else {
+                statusText.textContent = 'Not Connected';
+                statusText.className = 'drive-disconnected';
+                connectBtn.textContent = 'Connect';
+                connectBtn.onclick = () => connectToGoogleDrive();
             }
         }
-
-        // ============ DATA STRUCTURES ============
-        let teamMembers = [
-            { id: 1, name: "Lalitha", avatar: "LA", assigned: [], joinedDate: "2024-01-15" },
-            { id: 2, name: "Bareen", avatar: "BA", assigned: [], joinedDate: "2024-01-20" },
-            { id: 3, name: "Shruthi", avatar: "SH", assigned: [], joinedDate: "2024-02-01" },
-            { id: 4, name: "Neshvani", avatar: "NE", assigned: [], joinedDate: "2024-02-10" }
-        ];
-
-        let restaurantsDB = [];
-        let filteredDB = [];
-        let currentPage = 1;
-        let currentTab = "restaurants";
-        const ITEMS_PER_PAGE = 30;
-
-        // Document types
-        const documentTypes = {
-            agreement: { name: "Agreement/Contract", icon: "📄", color: "#4caf50" },
-            pan: { name: "PAN Card", icon: "🆔", color: "#ff9800" },
-            gst: { name: "GST Certificate", icon: "🏭", color: "#2196f3" },
-            license: { name: "FSSAI License", icon: "✅", color: "#9c27b0" },
-            other: { name: "Other Documents", icon: "📎", color: "#607d8b" }
-        };
-
-        // Bangalore areas
-        const AREAS = [
-            "Indiranagar", "Koramangala", "Whitefield", "HSR Layout", "Jayanagar", "Malleshwaram",
-            "JP Nagar", "Banashankari", "Rajajinagar", "Marathahalli", "Electronic City", "Sarjapur Road",
-            "MG Road", "Church Street", "Frazer Town", "Kammanahalli", "Kalyan Nagar", "Basavanagudi"
-        ];
-
-        const CUISINES = ["North Indian", "South Indian", "Chinese", "Italian", "Mexican", "Japanese", "Biryani", "Fast Food"];
-
-        // Generate restaurant data
-        function generateRestaurantData() {
-            for (let i = 0; i < 10500; i++) {
-                const area = AREAS[Math.floor(Math.random() * AREAS.length)];
-                const cuisine = CUISINES[Math.floor(Math.random() * CUISINES.length)];
-                const category = Math.random() < 0.1 ? "international" : (Math.random() < 0.25 ? "national" : "local");
-                
-                let name;
-                if (category === "international") {
-                    const intl = ["McDonald's", "KFC", "Pizza Hut", "Starbucks", "Domino's", "Burger King"];
-                    name = intl[Math.floor(Math.random() * intl.length)];
-                } else if (category === "national") {
-                    const national = ["Barbeque Nation", "Mainland China", "Punjab Grill", "Haldiram's", "Biryani Blues"];
-                    name = national[Math.floor(Math.random() * national.length)];
-                } else {
-                    const prefixes = ["Sri", "Shri", "The", "New", "Royal", "Grand"];
-                    const suffixes = ["Restaurant", "Cafe", "Kitchen", "Dining"];
-                    name = `${prefixes[Math.floor(Math.random() * prefixes.length)]} ${cuisine} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`;
-                }
-                
-                // Generate mobile numbers (2-4 per restaurant)
-                const mobiles = [];
-                const numMobiles = 2 + Math.floor(Math.random() * 3);
-                for (let j = 0; j < numMobiles; j++) {
-                    const prefix = ["98", "99", "97", "96", "95"][Math.floor(Math.random() * 5)];
-                    mobiles.push(`+91${prefix}${Math.floor(10000000 + Math.random() * 90000000)}`);
-                }
-                
-                // Discounts from Zomato/Swiggy
-                const discounts = ["10% off", "20% off", "30% off", "40% off", "50% off", "Free Delivery", "Buy 1 Get 1", "No discount"];
-                
-                // Generate sample documents
-                const documents = [];
-                if (Math.random() > 0.7) {
-                    const docTypes = ["agreement", "pan", "gst", "license", "other"];
-                    const numDocs = 1 + Math.floor(Math.random() * 3);
-                    for (let j = 0; j < numDocs; j++) {
-                        const docType = docTypes[Math.floor(Math.random() * docTypes.length)];
-                        documents.push({
-                            id: `doc_${i}_${j}_${Date.now()}`,
-                            type: docType,
-                            name: `${documentTypes[docType].name}_${name.replace(/\s/g, '_')}_${j+1}.pdf`,
-                            size: Math.floor(100 + Math.random() * 5000),
-                            uploadedAt: new Date().toISOString(),
-                            uploadedBy: teamMembers[Math.floor(Math.random() * teamMembers.length)].name,
-                            description: `Uploaded via ${Math.random() > 0.5 ? 'Scraper' : 'Manual'}`,
-                            fileId: null,
-                            driveUrl: null
-                        });
-                    }
-                }
-                
-                restaurantsDB.push({
+        
+        // ============ RESTAURANT DATA ============
+        function generateRestaurants() {
+            const areas = ["Indiranagar", "Koramangala", "Whitefield", "HSR Layout", "Jayanagar", "Malleshwaram", "JP Nagar", "Banashankari"];
+            const cuisines = ["North Indian", "South Indian", "Chinese", "Italian", "Mexican", "Japanese"];
+            const names = ["Spice Garden", "Flavors of India", "Royal Kitchen", "Bombay Bistro", "Mughal Darbar", "Garden Cafe", "Paradise", "Taj Mahal"];
+            
+            for (let i = 0; i < 50; i++) {
+                restaurants.push({
                     id: i + 1,
-                    name: name.trim(),
-                    category: category,
-                    location: area,
-                    fullAddress: `${Math.floor(100 + Math.random() * 900)} Main Road, ${area}, Bangalore`,
-                    mobiles: mobiles,
-                    email: name.toLowerCase().replace(/[^a-z0-9]/g, '') + Math.floor(Math.random() * 100) + "@gmail.com",
-                    cuisine: cuisine,
-                    discounts: {
-                        zomato: discounts[Math.floor(Math.random() * discounts.length)],
-                        swiggy: discounts[Math.floor(Math.random() * discounts.length)]
-                    },
-                    estimatedCommission: category === "international" ? "8-12%" : (category === "national" ? "10-15%" : "12-18%"),
-                    commissionSource: "Industry Benchmark (NRAI Report 2024)",
-                    stage: ["lead", "lead", "lead", "contacted", "negotiation"][Math.floor(Math.random() * 5)],
-                    assignedTo: null,
-                    googleRating: (3 + Math.random() * 2).toFixed(1),
-                    lastScraped: new Date().toISOString(),
-                    documents: documents
+                    name: names[Math.floor(Math.random() * names.length)] + " " + (i + 1),
+                    location: areas[Math.floor(Math.random() * areas.length)],
+                    cuisine: cuisines[Math.floor(Math.random() * cuisines.length)],
+                    phone: `+91${9800000000 + i}`,
+                    rating: (3 + Math.random() * 2).toFixed(1),
+                    documents: []
                 });
             }
-            
-            // Assign some restaurants to team members
-            restaurantsDB.forEach((restaurant, idx) => {
-                if (idx % 7 === 0 && teamMembers[0]) restaurant.assignedTo = teamMembers[0].id;
-                if (idx % 11 === 0 && teamMembers[1]) restaurant.assignedTo = teamMembers[1].id;
-                if (idx % 13 === 0 && teamMembers[2]) restaurant.assignedTo = teamMembers[2].id;
-                if (idx % 17 === 0 && teamMembers[3]) restaurant.assignedTo = teamMembers[3].id;
-            });
-            
-            updateTeamAssignments();
-        }
-
-        function updateTeamAssignments() {
-            teamMembers.forEach(member => {
-                member.assigned = restaurantsDB.filter(r => r.assignedTo === member.id).map(r => r.id);
-            });
-        }
-
-        // Scrape functions
-        async function scrapeSource(source) {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            document.getElementById('loadingText').textContent = `Scraping ${source}...`;
-            
-            for (let i = 0; i <= 100; i += 20) {
-                await new Promise(resolve => setTimeout(resolve, 300));
-                document.getElementById('scrapeProgress').style.width = `${i}%`;
-            }
-            
-            const newNumbersFound = Math.floor(Math.random() * 100);
-            restaurantsDB = restaurantsDB.map(r => {
-                if (Math.random() > 0.8) {
-                    r.mobiles.push(generateMobile());
-                    r.mobiles = [...new Set(r.mobiles)];
-                }
-                r.lastScraped = new Date().toISOString();
-                return r;
-            });
-            
-            document.getElementById('loadingOverlay').style.display = 'none';
-            document.getElementById('scrapeStatus').innerHTML = `✅ ${source}: Found ${newNumbersFound} new mobile numbers and updated discounts`;
-            setTimeout(() => {
-                document.getElementById('scrapeStatus').innerHTML = "";
-                document.getElementById('scrapeProgress').style.width = "0%";
-            }, 3000);
-            
-            updateStats();
-            applyFilters();
+            displayRestaurants();
         }
         
-        function generateMobile() {
-            const prefixes = ["98", "99", "97", "96", "95"];
-            return `+91${prefixes[Math.floor(Math.random() * prefixes.length)]}${Math.floor(10000000 + Math.random() * 90000000)}`;
+        function searchRestaurants() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = restaurants.filter(r => 
+                r.name.toLowerCase().includes(searchTerm) || 
+                r.location.toLowerCase().includes(searchTerm)
+            );
+            displayRestaurants(filtered);
         }
         
-        async function scrapeAllSources() {
-            const sources = ["Google Maps", "Zomato", "Swiggy", "Magicpin", "Instagram", "Facebook"];
-            for (let i = 0; i < sources.length; i++) {
-                await scrapeSource(sources[i]);
-            }
-        }
-        
-        // Team Management
-        function renderTeamView() {
-            const teamGrid = document.getElementById('teamGrid');
-            teamGrid.innerHTML = teamMembers.map(member => `
-                <div class="team-card ${member.id === currentTeamFilter ? 'active' : ''}" onclick="filterByTeam(${member.id})">
-                    <div class="team-avatar">${member.avatar}</div>
-                    <div class="team-name">${member.name}</div>
-                    <div class="team-assigned">Assigned: ${member.assigned.length}</div>
-                    <div class="team-assigned">Onboarded: ${member.assigned.filter(id => restaurantsDB.find(r => r.id === id)?.stage === 'onboarded').length}</div>
+        function displayRestaurants(list = restaurants) {
+            const grid = document.getElementById('restaurantsGrid');
+            grid.innerHTML = list.map(r => `
+                <div class="restaurant-card">
+                    <h3>${r.name}</h3>
+                    <p>📍 ${r.location} | 🍽️ ${r.cuisine} | ⭐ ${r.rating}/5</p>
+                    <p>📞 ${r.phone}</p>
+                    <div style="margin: 0.5rem 0;">
+                        <span class="doc-badge">📄 ${r.documents.length} document(s)</span>
+                    </div>
+                    <button onclick="openDocumentManager(${r.id})" class="btn-primary" style="margin-top: 0.5rem;">Manage Documents</button>
                 </div>
             `).join('');
-            
-            const tbody = document.getElementById('teamAssignmentsBody');
-            const restaurants = restaurantsDB.filter(r => currentTeamFilter ? r.assignedTo === currentTeamFilter : true);
-            tbody.innerHTML = restaurants.slice(0, 50).map(r => `
-                <tr>
-                    <td><strong>${r.name}</strong><br><small>${r.location}</small></td>
-                    <td>${teamMembers.find(m => m.id === r.assignedTo)?.name || 'Unassigned'}</td>
-                    <td>${r.mobiles.slice(0, 2).map(m => `<span class="mobile-badge">${m}</span>`).join('')}${r.mobiles.length > 2 ? `<span class="mobile-badge" style="background:#666;">+${r.mobiles.length-2}</span>` : ''}</td>
-                    <td>${r.documents.length} docs</td>
-                    <td><span style="background: ${r.stage === 'onboarded' ? '#4caf50' : '#ff9800'}; padding: 0.2rem 0.5rem; border-radius: 4px;">${r.stage}</span></td>
-                    <td class="action-buttons">
-                        <button class="btn-call" onclick="callRestaurant(${r.id})">📞</button>
-                        <button class="btn-onboard" onclick="onboardRestaurant(${r.id})">🚀</button>
-                        <button class="btn-docs" onclick="openDocumentManager(${r.id})">📄</button>
-                    </td>
-                </tr>
-            `).join('');
         }
         
-        let currentTeamFilter = null;
-        
-        function filterByTeam(teamId) {
-            currentTeamFilter = currentTeamFilter === teamId ? null : teamId;
-            renderTeamView();
-        }
-        
-        function addTeamMember() {
-            const name = prompt("Enter team member name:");
-            if (name) {
-                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                const newId = teamMembers.length + 1;
-                teamMembers.push({
-                    id: newId,
-                    name: name,
-                    avatar: initials,
-                    assigned: [],
-                    joinedDate: new Date().toISOString()
-                });
-                renderTeamView();
-            }
-        }
-        
-        // Document Management Functions with Google Drive
+        // ============ DOCUMENT MANAGER ============
         async function openDocumentManager(restaurantId) {
-            currentRestaurantId = restaurantId;
-            const restaurant = restaurantsDB.find(r => r.id === restaurantId);
-            const modal = document.getElementById('docManagerModal');
-            const content = document.getElementById('docManagerContent');
+            const restaurant = restaurants.find(r => r.id === restaurantId);
+            const modal = document.getElementById('docModal');
+            const modalContent = document.getElementById('modalContent');
             
-            content.innerHTML = `
+            modalContent.innerHTML = `
                 <h4>${restaurant.name}</h4>
-                <p style="color:#666; margin-bottom:1rem;">📍 ${restaurant.location} | ⭐ ${restaurant.googleRating}/5</p>
+                <p style="color:#666; margin-bottom:1rem;">📍 ${restaurant.location} | ⭐ ${restaurant.rating}/5</p>
                 
-                ${!isDriveConnected ? `
-                    <div style="background:#fff3e0; padding:1rem; border-radius:8px; margin-bottom:1rem;">
-                        ⚠️ Google Drive not connected. <button onclick="connectGoogleDrive()" style="background:#ff6b6b; color:white; border:none; padding:0.3rem 0.8rem; border-radius:4px; cursor:pointer;">Connect Now</button>
+                ${!isConnected ? `
+                    <div class="warning-box">
+                        ⚠️ Google Drive not connected. 
+                        <button onclick="connectToGoogleDrive()" class="btn-primary" style="margin-top:0.5rem;">Connect Now</button>
                     </div>
                 ` : `
                     <div class="upload-area" id="uploadArea">
-                        📁 Click or drag to upload to Google Drive
-                        <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.jpg,.png,.doc,.docx,.xlsx">
-                        <div id="uploadProgressContainer" style="display:none; margin-top:1rem;">
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="uploadProgressFill"></div>
-                            </div>
+                        📁 Click to upload to Google Drive
+                        <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.jpg,.png,.doc,.docx">
+                        <div id="uploadProgressDiv" style="display:none; margin-top:1rem;">
+                            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
                             <p id="uploadStatus" style="font-size:0.7rem; margin-top:0.3rem;"></p>
                         </div>
                     </div>
                     
                     <div style="margin: 1rem 0;">
-                        <strong>Select Document Type:</strong>
+                        <label><strong>Document Type:</strong></label>
                         <select id="docTypeSelect" style="width:100%; padding:0.5rem; margin-top:0.3rem; border-radius:8px; border:1px solid #ddd;">
-                            ${Object.entries(documentTypes).map(([key, type]) => `
-                                <option value="${key}">${type.icon} ${type.name}</option>
-                            `).join('')}
+                            <option value="agreement">📄 Agreement/Contract</option>
+                            <option value="pan">🆔 PAN Card</option>
+                            <option value="gst">🏭 GST Certificate</option>
+                            <option value="license">✅ FSSAI License</option>
+                            <option value="other">📎 Other</option>
                         </select>
-                    </div>
-                    
-                    <div style="margin: 1rem 0;">
-                        <strong>Description (Optional):</strong>
-                        <input type="text" id="docDescription" placeholder="e.g., Signed agreement, PAN card copy..." style="width:100%; padding:0.5rem; border-radius:8px; border:1px solid #ddd;">
                     </div>
                 `}
                 
-                <div style="margin-top:1.5rem;">
+                <div style="margin-top:1rem;">
                     <strong>📄 Uploaded Documents (${restaurant.documents.length})</strong>
-                    <div id="documentList" style="margin-top:0.5rem; max-height:300px; overflow-y:auto;">
+                    <div id="docList" style="margin-top:0.5rem; max-height:200px; overflow-y:auto;">
                         ${restaurant.documents.map(doc => `
-                            <div class="document-card" id="doc-${doc.id}">
-                                <div style="flex:1;">
-                                    <strong>${documentTypes[doc.type]?.icon || '📄'} ${doc.name}</strong>
-                                    <span class="doc-type-badge type-${doc.type}">${documentTypes[doc.type]?.name || 'Other'}</span>
-                                    <div style="font-size:0.7rem; color:#666; margin-top:0.2rem;">
-                                        Uploaded: ${new Date(doc.uploadedAt).toLocaleString()} by ${doc.uploadedBy}
-                                        ${doc.description ? `<br>📝 ${doc.description}` : ''}
-                                        ${doc.fileId ? `<br>📁 Drive ID: ${doc.fileId.substring(0, 10)}...` : ''}
-                                    </div>
+                            <div class="document-card">
+                                <div>
+                                    <strong>${doc.name}</strong>
+                                    <div style="font-size:0.7rem;">Uploaded: ${new Date(doc.uploadedAt).toLocaleDateString()}</div>
                                 </div>
                                 <div>
-                                    ${doc.driveUrl ? `<button onclick="viewDriveDocument('${doc.driveUrl}')" style="background:#2196f3; color:white; border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer; margin-right:0.3rem;">View</button>` : ''}
-                                    <button onclick="deleteDocument('${doc.id}', ${restaurantId})" style="background:#f44336; color:white; border:none; padding:0.3rem 0.6rem; border-radius:4px; cursor:pointer;">Delete</button>
+                                    <a href="${doc.url}" target="_blank" style="background:#2196f3; color:white; padding:0.2rem 0.5rem; border-radius:4px; text-decoration:none; font-size:0.7rem;">View</a>
+                                    <button onclick="deleteDocument(${restaurant.id}, '${doc.id}')" style="background:#f44336; color:white; border:none; padding:0.2rem 0.5rem; border-radius:4px; margin-left:0.3rem; cursor:pointer;">Delete</button>
                                 </div>
                             </div>
                         `).join('')}
-                        ${restaurant.documents.length === 0 ? '<div style="text-align:center; padding:1rem; color:#666;">No documents uploaded yet</div>' : ''}
                     </div>
-                </div>
-                
-                <div style="margin-top:1.5rem; display:flex; gap:1rem;">
-                    <button onclick="closeModal('docManagerModal')" style="flex:1; padding:0.8rem; background:#f0f0f0; border:none; border-radius:8px; cursor:pointer;">Close</button>
                 </div>
             `;
             
-            if (isDriveConnected) {
-                // Setup file upload
+            if (isConnected) {
                 const uploadArea = document.getElementById('uploadArea');
                 const fileInput = document.getElementById('fileInput');
                 
                 uploadArea.onclick = () => fileInput.click();
-                
-                uploadArea.ondragover = (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#ff6b6b';
-                    uploadArea.style.background = '#fff5f5';
+                fileInput.onchange = async (e) => {
+                    await handleFileUpload(e.target.files, restaurant);
                 };
-                
-                uploadArea.ondragleave = () => {
-                    uploadArea.style.borderColor = '#ddd';
-                    uploadArea.style.background = '';
-                };
-                
-                uploadArea.ondrop = (e) => {
-                    e.preventDefault();
-                    uploadArea.style.borderColor = '#ddd';
-                    uploadArea.style.background = '';
-                    handleFiles(e.dataTransfer.files, restaurantId);
-                };
-                
-                fileInput.onchange = (e) => handleFiles(e.target.files, restaurantId);
             }
             
             modal.style.display = 'flex';
         }
         
-        async function handleFiles(files, restaurantId) {
-            const restaurant = restaurantsDB.find(r => r.id === restaurantId);
+        async function handleFileUpload(files, restaurant) {
             const docType = document.getElementById('docTypeSelect').value;
-            const description = document.getElementById('docDescription').value;
-            const uploadContainer = document.getElementById('uploadProgressContainer');
-            const uploadFill = document.getElementById('uploadProgressFill');
+            const progressDiv = document.getElementById('uploadProgressDiv');
+            const progressFill = document.getElementById('progressFill');
             const uploadStatus = document.getElementById('uploadStatus');
             
-            uploadContainer.style.display = 'block';
+            progressDiv.style.display = 'block';
             
-            for (let index = 0; index < files.length; index++) {
-                const file = files[index];
-                uploadStatus.textContent = `Uploading to Google Drive: ${file.name}...`;
-                uploadFill.style.width = '0%';
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                uploadStatus.textContent = `Uploading: ${file.name}...`;
+                progressFill.style.width = '0%';
                 
-                // Upload to Google Drive
-                const driveFile = await uploadToGoogleDrive(file, restaurantId, restaurant.name, docType);
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    progressFill.style.width = `${progress}%`;
+                    if (progress >= 90) clearInterval(interval);
+                }, 100);
                 
-                if (driveFile) {
-                    // Create document object with Google Drive info
-                    const newDoc = {
-                        id: `doc_${Date.now()}_${index}_${Math.random()}`,
-                        type: docType,
+                const result = await uploadToDrive(file, restaurant.name, docType);
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+                
+                if (result) {
+                    restaurant.documents.push({
+                        id: `doc_${Date.now()}_${i}`,
                         name: file.name,
-                        size: file.size,
-                        description: description,
-                        uploadedAt: new Date().toISOString(),
-                        uploadedBy: "Sales Team",
-                        fileId: driveFile.fileId,
-                        driveUrl: driveFile.webViewLink
-                    };
-                    
-                    restaurant.documents.push(newDoc);
-                    uploadStatus.textContent = `✅ ${file.name} uploaded to Google Drive!`;
+                        type: docType,
+                        url: result.url,
+                        fileId: result.fileId,
+                        uploadedAt: new Date().toISOString()
+                    });
+                    uploadStatus.textContent = `✅ ${file.name} uploaded!`;
                 } else {
-                    uploadStatus.textContent = `❌ Failed to upload ${file.name}`;
+                    uploadStatus.textContent = `❌ Failed: ${file.name}`;
                 }
-                
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(r => setTimeout(r, 500));
             }
             
             setTimeout(() => {
-                uploadContainer.style.display = 'none';
-                uploadFill.style.width = '0%';
-                openDocumentManager(restaurantId);
+                progressDiv.style.display = 'none';
+                openDocumentManager(restaurant.id);
             }, 1000);
-            
-            updateStats();
-            applyFilters();
+            displayRestaurants();
         }
         
-        function viewDriveDocument(driveUrl) {
-            if (driveUrl) {
-                window.open(driveUrl, '_blank');
-            } else {
-                alert('Document URL not available');
-            }
-        }
-        
-        async function deleteDocument(docId, restaurantId) {
-            if (confirm('Are you sure you want to delete this document from Google Drive?')) {
-                const restaurant = restaurantsDB.find(r => r.id === restaurantId);
-                const doc = restaurant.documents.find(d => d.id === docId);
-                
-                if (doc && doc.fileId && isDriveConnected) {
-                    await deleteFromGoogleDrive(doc.fileId);
-                }
-                
+        function deleteDocument(restaurantId, docId) {
+            if (confirm('Delete this document?')) {
+                const restaurant = restaurants.find(r => r.id === restaurantId);
                 restaurant.documents = restaurant.documents.filter(d => d.id !== docId);
-                updateStats();
                 openDocumentManager(restaurantId);
-                applyFilters();
+                displayRestaurants();
             }
         }
         
-        function filterDocuments() {
-            const docType = document.getElementById('docTypeFilter').value;
-            const searchTerm = document.getElementById('docSearchInput').value.toLowerCase();
-            
-            const restaurantsWithDocs = restaurantsDB.filter(r => r.documents.length > 0);
-            const filtered = restaurantsWithDocs.filter(r => {
-                if (docType !== 'all' && !r.documents.some(d => d.type === docType)) return false;
-                if (searchTerm && !r.name.toLowerCase().includes(searchTerm)) return false;
-                return true;
-            });
-            
-            const tbody = document.getElementById('documentsBody');
-            tbody.innerHTML = filtered.slice(0, 100).map(r => `
-                <tr>
-                    <td><strong>${r.name}</strong><br><small>${r.cuisine}</small></td>
-                    <td>${r.location}</td>
-                    <td>
-                        ${r.documents.map(d => `
-                            <div class="doc-badge" onclick="viewDriveDocument('${d.driveUrl}')" style="display:inline-block; margin:0.2rem; cursor:pointer;">
-                                ${documentTypes[d.type]?.icon} ${d.name.substring(0, 20)}${d.name.length > 20 ? '...' : ''}
-                            </div>
-                        `).join('')}
-                    </td>
-                    <td>${r.documents[0]?.uploadedBy || 'N/A'}</td>
-                    <td>
-                        <button class="btn-docs" onclick="openDocumentManager(${r.id})">Manage</button>
-                    </td>
-                </tr>
-            `).join('');
+        function closeModal() {
+            document.getElementById('docModal').style.display = 'none';
         }
         
-        // Restaurant View Functions
-        function applyFilters() {
-            const category = document.getElementById('categoryFilter').value;
-            const assignedFilter = document.getElementById('assignedFilter').value;
-            const stageFilter = document.getElementById('stageFilter').value;
-            const docStatusFilter = document.getElementById('docStatusFilter').value;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            filteredDB = restaurantsDB.filter(r => {
-                if (category !== 'all' && r.category !== category) return false;
-                if (assignedFilter === 'unassigned' && r.assignedTo !== null) return false;
-                if (stageFilter !== 'all' && r.stage !== stageFilter) return false;
-                if (docStatusFilter === 'has' && r.documents.length === 0) return false;
-                if (docStatusFilter === 'no' && r.documents.length > 0) return false;
-                if (searchTerm && !r.name.toLowerCase().includes(searchTerm) && !r.location.toLowerCase().includes(searchTerm)) return false;
-                return true;
-            });
-            
-            currentPage = 1;
-            displayRestaurants();
-        }
+        // ============ INITIALIZATION ============
+        generateRestaurants();
+        document.getElementById('connectBtn').onclick = () => connectToGoogleDrive();
+        document.getElementById('saveAndConnect').onclick = () => connectToGoogleDrive();
         
-        function displayRestaurants() {
-            const start = (currentPage - 1) * ITEMS_PER_PAGE;
-            const end = start + ITEMS_PER_PAGE;
-            const pageData = filteredDB.slice(start, end);
-            
-            const tbody = document.getElementById('restaurantsBody');
-            tbody.innerHTML = pageData.map(r => `
-                <tr>
-                    <td><strong>${r.name}</strong><br><small>${r.cuisine} | ⭐ ${r.googleRating}</small></td>
-                    <td>${r.location}</td>
-                    <td>${r.mobiles.slice(0, 2).map(m => `<span class="mobile-badge" onclick="copyToClipboard('${m}')">${m}</span>`).join('')}${r.mobiles.length > 2 ? `<span class="mobile-badge" style="background:#666;">+${r.mobiles.length-2}</span>` : ''}</td>
-                    <td><span class="discount-badge">Z: ${r.discounts.zomato}</span> <span class="discount-badge">S: ${r.discounts.swiggy}</span></td>
-                    <td><span class="commission-estimate">${r.estimatedCommission}</span><br><small style="font-size:0.6rem;">${r.commissionSource}</small></td>
-                    <td><span class="doc-badge" onclick="openDocumentManager(${r.id})">📄 ${r.documents.length} docs</span></td>
-                    <td>${teamMembers.find(m => m.id === r.assignedTo)?.name || '<span style="color:#999;">Unassigned</span>'}</td>
-                    <td><span style="background: ${r.stage === 'onboarded' ? '#4caf50' : r.stage === 'contacted' ? '#2196f3' : r.stage === 'negotiation' ? '#ff9800' : '#9e9e9e'}; padding: 0.2rem 0.5rem; border-radius: 4px;">${r.stage}</span></td>
-                    <td class="action-buttons">
-                        <button class="btn-call" onclick="callRestaurant(${r.id})">📞</button>
-                        <button class="btn-onboard" onclick="onboardRestaurant(${r.id})">🚀</button>
-                        <button class="btn-details" onclick="showDetails(${r.id})">📋</button>
-                        <button class="btn-docs" onclick="openDocumentManager(${r.id})">📄</button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            const totalPages = Math.ceil(filteredDB.length / ITEMS_PER_PAGE);
-            let paginationHTML = '';
-            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
-                paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            }
-            document.getElementById('pagination').innerHTML = paginationHTML;
-        }
-        
-        function goToPage(page) {
-            currentPage = page;
-            displayRestaurants();
-        }
-        
-        function callRestaurant(id) {
-            const r = restaurantsDB.find(r => r.id === id);
-            if (r.mobiles.length) {
-                window.location.href = `tel:${r.mobiles[0]}`;
-                if (r.stage === 'lead') {
-                    r.stage = 'contacted';
-                    updateStats();
-                    applyFilters();
-                }
-            }
-        }
-        
-        function onboardRestaurant(id) {
-            const restaurant = restaurantsDB.find(r => r.id === id);
-            const modal = document.getElementById('onboardingModal');
-            const content = document.getElementById('onboardingContent');
-            
-            content.innerHTML = `
-                <h4>${restaurant.name}</h4>
-                <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    <strong>📱 Available Mobile Numbers:</strong><br>
-                    ${restaurant.mobiles.map(m => `<div style="margin: 0.3rem 0;">${m} <button onclick="copyToClipboard('${m}')">Copy</button></div>`).join('')}
-                </div>
-                <div style="background: #e8f5e9; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    <strong>📄 Documents Status:</strong><br>
-                    ${restaurant.documents.length} document(s) uploaded to Google Drive
-                </div>
-                <form id="onboardForm">
-                    <div style="margin-bottom: 1rem;">
-                        <label>Assign to Team Member:</label>
-                        <select id="assignTo" style="width: 100%; padding: 0.5rem; margin-top: 0.3rem;">
-                            <option value="">-- Unassigned --</option>
-                            ${teamMembers.map(m => `<option value="${m.id}" ${restaurant.assignedTo === m.id ? 'selected' : ''}>${m.name}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <label>Commission Offered (%):</label>
-                        <input type="number" id="commission" value="${restaurant.estimatedCommission.split('-')[0].trim()}" style="width: 100%; padding: 0.5rem;">
-                        <small>Industry benchmark: ${restaurant.estimatedCommission}</small>
-                    </div>
-                    <div style="margin-bottom: 1rem;">
-                        <label>Notes:</label>
-                        <textarea id="notes" rows="2" style="width: 100%; padding: 0.5rem;"></textarea>
-                    </div>
-                    <button type="submit" style="width: 100%; padding: 0.8rem; background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; border: none; border-radius: 8px; cursor: pointer;">
-                        Confirm Onboarding
-                    </button>
-                </form>
-            `;
-            
-            document.getElementById('onboardForm').onsubmit = (e) => {
-                e.preventDefault();
-                restaurant.stage = 'onboarded';
-                restaurant.assignedTo = document.getElementById('assignTo').value ? parseInt(document.getElementById('assignTo').value) : null;
-                updateStats();
-                updateTeamAssignments();
-                applyFilters();
-                renderTeamView();
-                renderAnalytics();
-                closeModal('onboardingModal');
-                alert(`✅ Successfully onboarded ${restaurant.name} to Tipplr!\n\nAssigned to: ${teamMembers.find(m => m.id === restaurant.assignedTo)?.name || 'Unassigned'}\nCommission: ${document.getElementById('commission').value}%`);
-            };
-            
-            modal.style.display = 'flex';
-        }
-        
-        function showDetails(id) {
-            const r = restaurantsDB.find(r => r.id === id);
-            const modal = document.getElementById('detailsModal');
-            const content = document.getElementById('detailsContent');
-            
-            content.innerHTML = `
-                <h4>${r.name}</h4>
-                <p><strong>📍 Location:</strong> ${r.fullAddress}</p>
-                <p><strong>🍽️ Cuisine:</strong> ${r.cuisine}</p>
-                <p><strong>⭐ Rating:</strong> ${r.googleRating}/5</p>
-                <p><strong>📧 Email:</strong> ${r.email}</p>
-                <div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    <strong>📞 All Mobile Numbers:</strong><br>
-                    ${r.mobiles.map(m => `<div>${m}</div>`).join('')}
-                </div>
-                <div>
-                    <strong>💰 Current Discounts:</strong><br>
-                    Zomato: ${r.discounts.zomato}<br>
-                    Swiggy: ${r.discounts.swiggy}
-                </div>
-                <div style="margin-top: 1rem;">
-                    <strong>📊 Estimated Commission:</strong> ${r.estimatedCommission}<br>
-                    <small>Source: ${r.commissionSource}</small>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <strong>📄 Google Drive Documents (${r.documents.length}):</strong><br>
-                    ${r.documents.map(d => `
-                        <div style="background:#f8f9fa; padding:0.5rem; margin:0.3rem 0; border-radius:4px;">
-                            ${documentTypes[d.type]?.icon} ${d.name}
-                            <span class="doc-type-badge type-${d.type}">${documentTypes[d.type]?.name}</span>
-                            ${d.driveUrl ? `<button onclick="window.open('${d.driveUrl}', '_blank')" style="float:right;">View in Drive</button>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-                <p style="margin-top: 1rem; color: #666; font-size: 0.7rem;">Last Scraped: ${new Date(r.lastScraped).toLocaleString()}</p>
-            `;
-            
-            modal.style.display = 'flex';
-        }
-        
-        function renderAnalytics() {
-            const total = restaurantsDB.length;
-            const onboarded = restaurantsDB.filter(r => r.stage === 'onboarded').length;
-            const contacted = restaurantsDB.filter(r => r.stage === 'contacted').length;
-            const negotiation = restaurantsDB.filter(r => r.stage === 'negotiation').length;
-            const totalDocs = restaurantsDB.reduce((sum, r) => sum + r.documents.length, 0);
-            
-            document.getElementById('analyticsTotal').textContent = total.toLocaleString();
-            document.getElementById('analyticsOnboarded').textContent = onboarded.toLocaleString();
-            document.getElementById('analyticsContacted').textContent = contacted.toLocaleString();
-            document.getElementById('analyticsNegotiation').textContent = negotiation.toLocaleString();
-            document.getElementById('analyticsDocuments').textContent = totalDocs.toLocaleString();
-            
-            const tbody = document.getElementById('teamPerformanceBody');
-            tbody.innerHTML = teamMembers.map(m => {
-                const assigned = restaurantsDB.filter(r => r.assignedTo === m.id);
-                const contactedCount = assigned.filter(r => r.stage === 'contacted').length;
-                const negotiationCount = assigned.filter(r => r.stage === 'negotiation').length;
-                const onboardedCount = assigned.filter(r => r.stage === 'onboarded').length;
-                const docsUploaded = assigned.reduce((sum, r) => sum + r.documents.length, 0);
-                const conversionRate = assigned.length ? ((onboardedCount / assigned.length) * 100).toFixed(1) : 0;
-                
-                return `
-                    <tr>
-                        <td><strong>${m.name}</strong></td>
-                        <td>${assigned.length}</td>
-                        <td>${contactedCount}</td>
-                        <td>${negotiationCount}</td>
-                        <td>${onboardedCount}</td>
-                        <td>${docsUploaded}</td>
-                        <td>${conversionRate}%</td>
-                    </tr>
-                `;
-            }).join('');
-        }
-        
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            alert(`Copied: ${text}`);
-        }
-        
-        function exportData() {
-            const dataToExport = filteredDB.length ? filteredDB : restaurantsDB;
-            const headers = ['ID', 'Restaurant', 'Location', 'Mobile Numbers', 'Email', 'Zomato Discount', 'Swiggy Discount', 'Est. Commission', 'Stage', 'Assigned To', 'Documents Count'];
-            
-            const csvData = dataToExport.map(r => [
-                r.id, r.name, r.location, r.mobiles.join('; '), r.email,
-                r.discounts.zomato, r.discounts.swiggy, r.estimatedCommission, r.stage,
-                teamMembers.find(m => m.id === r.assignedTo)?.name || '',
-                r.documents.length
-            ]);
-            
-            const csvContent = [headers, ...csvData].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `tipplr_restaurants_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-            URL.revokeObjectURL(link.href);
-            
-            alert(`Exported ${dataToExport.length} restaurants!`);
-        }
-        
-        function updateStats() {
-            const totalMobiles = restaurantsDB.reduce((sum, r) => sum + r.mobiles.length, 0);
-            const onboarded = restaurantsDB.filter(r => r.stage === 'onboarded').length;
-            const totalDocs = restaurantsDB.reduce((sum, r) => sum + r.documents.length, 0);
-            
-            document.getElementById('totalRestaurants').textContent = restaurantsDB.length.toLocaleString();
-            document.getElementById('totalMobiles').textContent = totalMobiles.toLocaleString();
-            document.getElementById('totalDocuments').textContent = totalDocs.toLocaleString();
-            document.getElementById('totalOnboarded').textContent = onboarded.toLocaleString();
-        }
-        
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            if (modalId === 'docManagerModal') {
-                currentRestaurantId = null;
-            }
-        }
-        
-        // Tab Navigation
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-            
-            document.getElementById('restaurantsView').style.display = tab === 'restaurants' ? 'block' : 'none';
-            document.getElementById('teamView').style.display = tab === 'team' ? 'block' : 'none';
-            document.getElementById('documentsView').style.display = tab === 'documents' ? 'block' : 'none';
-            document.getElementById('analyticsView').style.display = tab === 'analytics' ? 'block' : 'none';
-            
-            if (tab === 'team') renderTeamView();
-            if (tab === 'documents') filterDocuments();
-            if (tab === 'analytics') renderAnalytics();
-        }
-        
-        // Initialize
-        generateRestaurantData();
-        updateStats();
-        filteredDB = [...restaurantsDB];
-        displayRestaurants();
-        
-        // Initialize Google Drive
-        initGoogleDriveAPI();
-        
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
-        });
-        
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
+        window.onclick = (event) => {
+            if (event.target.classList.contains('modal')) closeModal();
+        };
     </script>
 </body>
 </html>
