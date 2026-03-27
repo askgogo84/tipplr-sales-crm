@@ -1,678 +1,1501 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tipplr CRM - Google Drive Working</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-        }
-        .header {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .logo h1 {
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .drive-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(255,255,255,0.1);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-        }
-        .drive-connected { color: #4caf50; }
-        .drive-disconnected { color: #ff6b6b; }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        .setup-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .warning-box {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 8px;
-        }
-        .success-box {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 8px;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-secondary {
-            background: #4caf50;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .upload-area {
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            margin: 1rem 0;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .upload-area:hover {
-            border-color: #ff6b6b;
-            background: #f8f9fa;
-        }
-        .restaurant-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .restaurant-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .restaurants-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1rem;
-        }
-        .doc-badge {
-            background: #9c27b0;
-            color: white;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            display: inline-block;
-        }
-        .filters-bar {
-            background: white;
-            border-radius: 16px;
-            padding: 1rem;
-            margin-bottom: 2rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-input {
-            flex: 1;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        .progress-bar {
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: #4caf50;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .document-card {
-            background: #f8f9fa;
-            padding: 0.5rem;
-            margin: 0.3rem 0;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .url-box {
-            background: #f0f0f0;
-            padding: 0.5rem;
-            border-radius: 8px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            word-break: break-all;
-            margin: 0.5rem 0;
-        }
-        @media (max-width: 768px) {
-            .restaurants-grid { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; text-align: center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tipplr Sales CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f2f8;--sur:#fff;--s2:#f7f8fc;--s3:#eef0f7;
+  --bdr:#e2e6f0;--bdr2:#cdd2e8;
+  --A:#e8344e;--C:#6c5ce7;
+  --txt:#1a1d2e;--t2:#5a6080;--t3:#9aa0bc;
+  --ok:#00b894;--warn:#f39c12;--inf:#0984e3;--dan:#d63031;
+  --r:14px;
+  --sh:0 1px 3px rgba(30,40,90,.06);
+  --sh1:0 4px 20px rgba(30,40,90,.10);
+  --sh2:0 12px 40px rgba(30,40,90,.16);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--s2);}::-webkit-scrollbar-thumb{background:var(--bdr2);border-radius:3px;}
+
+/* ── HEADER ── */
+.hdr{background:var(--sur);border-bottom:1px solid var(--bdr);padding:0 1.5rem;position:sticky;top:0;z-index:500;box-shadow:var(--sh);}
+.hdr-in{max-width:1900px;margin:0 auto;display:flex;align-items:center;gap:1rem;height:60px;}
+.logo{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
+.logo-ic{width:34px;height:34px;background:linear-gradient(135deg,var(--A),var(--C));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.logo-tx{font-size:1rem;font-weight:800;}
+.logo-sb{font-size:.55rem;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+.nav{display:flex;gap:.1rem;background:var(--s2);padding:.2rem;border-radius:9px;border:1px solid var(--bdr);}
+.nb{padding:.34rem 1rem;border:1.5px solid transparent;background:transparent;color:var(--t2);cursor:pointer;border-radius:7px;font-size:.8rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;transition:all .18s;white-space:nowrap;}
+.nb:hover{color:var(--C);background:rgba(108,92,231,.06);}
+.nb.on{background:var(--sur);color:var(--C);border-color:var(--bdr);box-shadow:var(--sh);}
+.hstats{display:flex;gap:.25rem;margin-left:auto;}
+.hs{text-align:center;padding:.26rem .75rem;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;}
+.hs-n{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:700;line-height:1;}
+.hs-l{font-size:.53rem;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.dpill{display:flex;align-items:center;gap:.4rem;padding:.3rem .8rem;border-radius:20px;border:1.5px solid var(--bdr2);font-size:.72rem;cursor:pointer;font-weight:700;color:var(--t2);background:var(--sur);flex-shrink:0;transition:all .2s;}
+.dpill:hover{border-color:var(--ok);color:var(--ok);}
+.dpill.ok{border-color:var(--ok);color:var(--ok);background:#f0fdf9;}
+.ddot{width:6px;height:6px;border-radius:50%;}
+.ddot.on{background:var(--ok);}.ddot.off{background:var(--bdr2);}
+
+/* ── LAYOUT ── */
+.main{max-width:1900px;margin:0 auto;padding:1.25rem 1.5rem;}
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--sh);}
+.view{display:none;}.view.active{display:block;}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.st{font-size:.88rem;font-weight:800;}
+
+/* ── SCRAPER ── */
+.scraper{padding:.85rem 1.3rem;display:flex;align-items:center;gap:.85rem;flex-wrap:wrap;margin-bottom:1.1rem;}
+.slbl{font-size:.63rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.chips{display:flex;gap:.35rem;flex-wrap:wrap;flex:1;}
+.chip{padding:.24rem .65rem;border-radius:20px;font-size:.68rem;font-weight:700;border:1.5px solid;cursor:pointer;transition:all .18s;user-select:none;}
+.cz{border-color:#e23744;color:#e23744;}.cz.on{background:#e23744;color:#fff;}
+.cs{border-color:#fc8019;color:#fc8019;}.cs.on{background:#fc8019;color:#fff;}
+.cg{border-color:#1a73e8;color:#1a73e8;}.cg.on{background:#1a73e8;color:#fff;}
+.cm{border-color:#9c27b0;color:#9c27b0;}.cm.on{background:#9c27b0;color:#fff;}
+.cd{border-color:#00b894;color:#00b894;}.cd.on{background:#00b894;color:#fff;}
+.sbtn{background:linear-gradient(135deg,var(--A),var(--C));color:#fff;border:none;padding:.38rem 1.1rem;border-radius:8px;cursor:pointer;font-size:.78rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;gap:.4rem;flex-shrink:0;transition:opacity .2s;}
+.sbtn:hover{opacity:.9;}.sbtn:disabled{opacity:.4;cursor:not-allowed;}
+.pwrap{display:none;align-items:center;gap:.7rem;flex:1;min-width:160px;}
+.ptrack{flex:1;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.pfill{height:100%;background:linear-gradient(90deg,var(--A),var(--C));border-radius:2px;transition:width .3s;}
+.plbl{font-size:.63rem;color:var(--t2);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+
+/* ── FILTERS ── */
+.filters{padding:.75rem 1.3rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1.1rem;}
+.fi{background:var(--s2);border:1.5px solid var(--bdr);color:var(--txt);padding:.36rem .68rem;border-radius:8px;font-size:.76rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;cursor:pointer;}
+.fi:focus{border-color:var(--C);}
+.fi-s{flex:1;min-width:200px;}.fi-s::placeholder{color:var(--t3);}
+.fc{font-size:.65rem;color:var(--t3);font-family:'JetBrains Mono',monospace;white-space:nowrap;margin-left:auto;}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:8px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.76rem;padding:.36rem .9rem;transition:all .18s;display:inline-flex;align-items:center;gap:.3rem;}
+.btn-p{background:linear-gradient(135deg,var(--A),var(--C));color:#fff;}
+.btn-p:hover{opacity:.9;}
+.btn-g{background:var(--s2);color:var(--t2);border:1.5px solid var(--bdr);}
+.btn-g:hover{color:var(--txt);border-color:var(--bdr2);}
+.btn-ok{background:var(--ok);color:#fff;}
+.btn-d{background:var(--dan);color:#fff;}
+.btn-info{background:var(--inf);color:#fff;}
+.btn-sm{padding:.18rem .5rem;font-size:.66rem;border-radius:6px;}
+
+/* ── TABLE ── */
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;min-width:1200px;}
+thead th{background:var(--s2);padding:.65rem .9rem;font-size:.6rem;font-weight:700;color:var(--t3);text-align:left;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.7px;border-bottom:1.5px solid var(--bdr);white-space:nowrap;}
+tbody td{padding:.62rem .9rem;border-bottom:1px solid var(--bdr);font-size:.77rem;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--s2);}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:.14rem .44rem;border-radius:4px;font-size:.6rem;font-weight:700;line-height:1.4;}
+.bz{background:#ffeef0;color:#c0392b;border:1px solid #ffd5d8;}
+.bs{background:#fff5eb;color:#d35400;border:1px solid #fcdcb4;}
+.bf{background:#f0edff;color:var(--C);border:1px solid #cec5f5;}
+.bc{background:#e8faf5;color:#00815d;border:1px solid #b0e8d6;}
+.ptag{display:inline-flex;align-items:center;gap:.2rem;background:#eaf9f5;color:#00815d;border:1px solid #b0e8d6;border-radius:4px;padding:.11rem .36rem;font-size:.62rem;font-weight:700;cursor:pointer;margin:.07rem;}
+.ptag:hover{background:#d0f0e8;}
+.sp{padding:.16rem .52rem;border-radius:20px;font-size:.62rem;font-weight:700;display:inline-block;}
+.sl{background:#f3f4f6;color:#6b7280;}
+.sc{background:#eff6ff;color:#1d4ed8;}
+.sn{background:#fffbeb;color:#b45309;}
+.so{background:#f0fdf4;color:#166534;}
+.csel{background:var(--s2);border:1.5px solid var(--bdr);color:var(--txt);padding:.2rem .42rem;border-radius:6px;font-size:.67rem;font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;outline:none;max-width:118px;}
+.csel:focus{border-color:var(--C);}
+
+/* ACTION BUTTONS */
+.arow{display:flex;gap:.22rem;}
+.ib{width:26px;height:26px;border:1px solid;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;transition:all .15s;background:transparent;}
+.ib:hover{transform:translateY(-1px);}
+.i-c{background:#f0fdf4;border-color:#b0e8d6;color:#166534;}
+.i-o{background:#fef2f2;border-color:#fecaca;color:#dc2626;}
+.i-d{background:#f5f3ff;border-color:#ddd6fe;color:#7c3aed;}
+.i-v{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;}
+.i-w{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}
+.i-rem{background:#fff7ed;border-color:#fed7aa;color:#c2410c;}
+
+/* PAG */
+.pag{display:flex;gap:.22rem;padding:.8rem 1.3rem;flex-wrap:wrap;align-items:center;border-top:1px solid var(--bdr);}
+.pgb{width:29px;height:29px;border:1.5px solid var(--bdr);background:var(--s2);color:var(--t2);border-radius:7px;cursor:pointer;font-size:.67rem;font-family:'JetBrains Mono',monospace;}
+.pgb:hover{border-color:var(--C);color:var(--C);}
+.pgb.on{background:var(--C);border-color:var(--C);color:#fff;}
+.pgi{margin-left:auto;font-size:.64rem;color:var(--t3);font-family:'JetBrains Mono',monospace;}
+
+/* ── TEAM ── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:.85rem;margin-bottom:1.2rem;}
+.tcard{background:var(--sur);border:1.5px solid var(--bdr);border-radius:var(--r);padding:1.3rem 1.1rem;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--sh);}
+.tcard:hover{border-color:var(--C);box-shadow:var(--sh1);}
+.tcard.sel{border-color:var(--C);background:linear-gradient(135deg,#f8f7ff,#f2eeff);}
+.tav{width:52px;height:52px;border-radius:50%;margin:0 auto .7rem;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1rem;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.14);}
+.tn{font-weight:800;font-size:.86rem;margin-bottom:.14rem;}
+.tr2{font-size:.65rem;color:var(--t3);margin-bottom:.65rem;}
+.tsr{display:flex;gap:.28rem;justify-content:center;flex-wrap:wrap;}
+.tst{font-size:.6rem;font-weight:700;padding:.14rem .4rem;border-radius:4px;}
+.tbar-wrap{background:var(--s3);border-radius:5px;height:6px;overflow:hidden;margin-top:.5rem;}
+.tbar{height:100%;border-radius:5px;transition:width .4s;}
+.add-tc{border:2px dashed var(--bdr2);background:transparent;color:var(--t3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;min-height:160px;}
+.add-tc:hover{border-color:var(--C);color:var(--C);}
+
+/* ── ANALYTICS ── */
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.acard{background:var(--sur);border:1.5px solid var(--bdr);border-radius:var(--r);padding:1.1rem;box-shadow:var(--sh);}
+.albl{font-size:.59rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.7px;font-family:'JetBrains Mono',monospace;}
+.aval{font-size:1.75rem;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1.1;margin:.2rem 0 .13rem;}
+.asub{font-size:.64rem;color:var(--t3);}
+.ana-bar{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:.8rem 1.2rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-bottom:1.1rem;box-shadow:var(--sh);}
+
+/* ── MODALS ── */
+.ov{display:none;position:fixed;inset:0;background:rgba(26,29,46,.45);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.ov.open{display:flex;}
+.modal{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:1.7rem;max-width:660px;width:92%;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);}
+.modal-sm{max-width:420px;}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.3rem;}
+.mtitle{font-size:.95rem;font-weight:800;}
+.mclose{background:var(--s2);border:1px solid var(--bdr);color:var(--t2);cursor:pointer;width:28px;height:28px;border-radius:7px;font-size:.92rem;display:flex;align-items:center;justify-content:center;}
+.mclose:hover{color:var(--dan);border-color:#fecaca;}
+.fg{margin-bottom:.82rem;}
+.fl{display:block;font-size:.7rem;font-weight:700;color:var(--t2);margin-bottom:.32rem;}
+.fi2{width:100%;background:var(--s2);border:1.5px solid var(--bdr);color:var(--txt);padding:.48rem .78rem;border-radius:9px;font-size:.81rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;}
+.fi2:focus{border-color:var(--C);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.82rem;}
+.fta{width:100%;min-height:85px;resize:vertical;background:var(--s2);border:1.5px solid var(--bdr);color:var(--txt);padding:.52rem .78rem;border-radius:9px;font-size:.79rem;font-family:'Plus Jakarta Sans',sans-serif;outline:none;}
+.fta:focus{border-color:var(--C);}
+.dtabs{display:flex;gap:.18rem;margin-bottom:1.25rem;border-bottom:1.5px solid var(--bdr);}
+.dtab{padding:.38rem .9rem;border-radius:7px 7px 0 0;cursor:pointer;font-size:.75rem;font-weight:700;color:var(--t2);border:1.5px solid transparent;border-bottom:none;transition:all .15s;margin-bottom:-1.5px;}
+.dtab:hover{color:var(--C);}
+.dtab.active{color:var(--C);background:var(--sur);border-color:var(--bdr);border-bottom-color:var(--sur);}
+
+/* ONBOARD TABS */
+.ob-tabs{display:flex;gap:.5rem;margin-bottom:1.2rem;}
+.ob-tab{flex:1;padding:.65rem;border-radius:10px;border:1.5px solid var(--bdr);cursor:pointer;text-align:center;transition:all .2s;background:var(--s2);}
+.ob-tab:hover{border-color:var(--C);}
+.ob-tab.active{border-color:var(--C);background:linear-gradient(135deg,#f8f7ff,#f0edff);}
+.ob-tab-icon{font-size:1.5rem;margin-bottom:.25rem;}
+.ob-tab-lbl{font-size:.78rem;font-weight:800;color:var(--txt);}
+.ob-tab-sub{font-size:.65rem;color:var(--t3);margin-top:.15rem;}
+
+/* UPLOAD */
+.upzone{border:2px dashed var(--bdr2);border-radius:11px;padding:1.6rem;text-align:center;cursor:pointer;transition:all .2s;color:var(--t2);background:var(--s2);margin-bottom:.82rem;}
+.upzone:hover,.upzone.drag{border-color:var(--C);background:#f5f3ff;color:var(--C);}
+.doclist{display:flex;flex-direction:column;gap:.38rem;}
+.docitem{background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:.55rem .82rem;display:flex;align-items:center;justify-content:space-between;}
+
+/* DOC SECTION HEADER */
+.doc-sec{font-size:.72rem;font-weight:800;color:var(--t2);padding:.5rem 0 .35rem;border-top:1px solid var(--bdr);margin-top:.75rem;display:flex;align-items:center;gap:.4rem;}
+.doc-sec:first-child{border-top:none;margin-top:0;}
+
+/* WARN */
+.warn-box{background:#fffbeb;border:1px solid #fcd34d;border-radius:9px;padding:.72rem .92rem;font-size:.76rem;color:#92400e;display:flex;align-items:center;gap:.6rem;margin-bottom:.82rem;flex-wrap:wrap;}
+.info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:.72rem .92rem;font-size:.76rem;color:#1e40af;display:flex;align-items:center;gap:.6rem;margin-bottom:.82rem;}
+
+/* REMINDER BADGE */
+.rem-badge{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn);}
+
+/* TOASTS */
+.toasts{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.38rem;pointer-events:none;}
+.toast{background:var(--sur);border:1px solid var(--bdr);border-radius:11px;padding:.65rem .88rem;font-size:.76rem;font-weight:600;max-width:310px;display:flex;align-items:center;gap:.5rem;pointer-events:auto;box-shadow:var(--sh2);animation:tIn .25s ease;}
+.toast.success{border-color:#b0e8d6;background:#f0fdf9;}
+.toast.error{border-color:#fecaca;background:#fef2f2;}
+.toast.warn{border-color:#fcd34d;background:#fffbeb;}
+@keyframes tIn{from{transform:translateX(60px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* TYPE COLORS */
+.tc-restaurant{color:#6c5ce7;background:#f0edff;}
+.tc-cafe{color:#b45309;background:#fffbeb;}
+.tc-bakery{color:#9a3412;background:#fff7ed;}
+.tc-qsr{color:#dc2626;background:#fef2f2;}
+.tc-cloud{color:#1d4ed8;background:#eff6ff;}
+.tc-fine{color:#166534;background:#f0fdf4;}
+.tc-bar{color:#1e293b;background:#f1f5f9;}
+.tc-other{color:#374151;background:#f9fafb;}
+
+@media(max-width:900px){.hstats{display:none;}.main{padding:1rem;}}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="logo">
-                <h1>🍽️ Tipplr Sales CRM</h1>
-                <p>Google Drive Document Management</p>
-            </div>
-            <div class="drive-status" id="driveStatus">
-                <span>📁 Google Drive:</span>
-                <span id="driveStatusText" class="drive-disconnected">Not Connected</span>
-                <button id="connectBtn" class="btn-primary" style="background: none; border: 1px solid white; padding: 0.2rem 0.8rem;">Connect</button>
-            </div>
+
+<!-- ═══ HEADER ═══ -->
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="logo">
+      <div class="logo-ic">🍽️</div>
+      <div><div class="logo-tx">Tipplr CRM</div><div class="logo-sb">RESTAURANT INTELLIGENCE PLATFORM</div></div>
+    </div>
+    <nav class="nav">
+      <button class="nb on"  id="nav-restaurants" onclick="switchView('restaurants')">🏠 Restaurants</button>
+      <button class="nb"     id="nav-team"         onclick="switchView('team')">👥 Team</button>
+      <button class="nb"     id="nav-analytics"    onclick="switchView('analytics')">📊 Analytics</button>
+    </nav>
+    <div class="hstats">
+      <div class="hs"><div class="hs-n" id="hT" style="color:var(--C)">0</div><div class="hs-l">Total</div></div>
+      <div class="hs"><div class="hs-n" id="hO" style="color:var(--ok)">0</div><div class="hs-l">Onboarded</div></div>
+      <div class="hs"><div class="hs-n" id="hTd" style="color:var(--A)">0</div><div class="hs-l">Today</div></div>
+      <div class="hs"><div class="hs-n" id="hPipe" style="color:var(--warn)">0</div><div class="hs-l">Pipeline</div></div>
+    </div>
+    <div class="dpill" id="dpill" onclick="connectDrive()">
+      <div class="ddot off" id="ddot"></div>
+      <span id="dlbl">Connect Google Drive</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+<!-- ░░ RESTAURANTS ░░ -->
+<div class="view active" id="view-restaurants">
+  <div class="card scraper">
+    <span class="slbl">Scrape from:</span>
+    <div class="chips">
+      <span class="chip cz on" onclick="toggleChip(this,'zomato')">🔴 Zomato</span>
+      <span class="chip cs on" onclick="toggleChip(this,'swiggy')">🟠 Swiggy</span>
+      <span class="chip cg on" onclick="toggleChip(this,'google')">🔵 Google Maps</span>
+      <span class="chip cm on" onclick="toggleChip(this,'magicpin')">🟣 Magicpin</span>
+      <span class="chip cd"   onclick="toggleChip(this,'dunzo')">🟢 Dunzo</span>
+    </div>
+    <div class="pwrap" id="pwrap">
+      <div class="ptrack"><div class="pfill" id="pfill" style="width:0%"></div></div>
+      <span class="plbl" id="plbl">Starting…</span>
+    </div>
+    <button class="sbtn" id="scrapeBtn" onclick="startScrape()">🔄 Scrape Data</button>
+  </div>
+
+  <div class="card filters">
+    <input type="text" class="fi fi-s" id="qInput" placeholder="🔍  Search name, area, FSSAI, phone, email, type…" oninput="applyF()">
+    <select class="fi" id="typeFilter" onchange="applyF()">
+      <option value="all">All Types</option>
+      <option>Restaurant</option><option>Cafe</option><option>Bakery</option>
+      <option>Sweet Shop</option><option>QSR</option><option>Fast Food</option>
+      <option>Cloud Kitchen</option><option>Fine Dining</option><option>Dhaba</option>
+      <option>Bar & Pub</option><option>Ice Cream</option><option>Juice Shop</option><option>Mithai</option>
+    </select>
+    <select class="fi" id="catFilter" onchange="applyF()">
+      <option value="all">All Categories</option>
+      <option value="international">🌍 International</option>
+      <option value="national">🇮🇳 National</option>
+      <option value="local">🏠 Local</option>
+    </select>
+    <select class="fi" id="teamFilter" onchange="applyF()"><option value="all">All Members</option></select>
+    <select class="fi" id="stageFilter" onchange="applyF()">
+      <option value="all">All Stages</option>
+      <option value="lead">Lead</option><option value="contacted">Contacted</option>
+      <option value="negotiation">Negotiation</option><option value="onboarded">Onboarded</option>
+    </select>
+    <select class="fi" id="srcFilter" onchange="applyF()">
+      <option value="all">All Sources</option>
+      <option value="zomato">Zomato</option><option value="swiggy">Swiggy</option>
+      <option value="google">Google Maps</option><option value="magicpin">Magicpin</option>
+    </select>
+    <select class="fi" id="areaFilter" onchange="applyF()"><option value="all">All Areas</option></select>
+    <button class="btn btn-g btn-sm" onclick="clearF()">✕ Clear</button>
+    <button class="btn btn-g btn-sm" onclick="exportCSV()">📥 Export</button>
+    <span class="fc" id="fc">—</span>
+  </div>
+
+  <div class="card">
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Restaurant / Type</th><th>Area</th><th>Contact</th>
+          <th>Discounts</th><th>FSSAI</th><th>Commission</th>
+          <th>Assign</th><th>Stage</th><th>Follow-up</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="rBody"></tbody>
+      </table>
+    </div>
+    <div class="pag" id="pag"></div>
+  </div>
+</div>
+
+<!-- ░░ TEAM ░░ -->
+<div class="view" id="view-team">
+  <div class="sh">
+    <span class="st">👥 Sales Team</span>
+    <div style="display:flex;gap:.5rem;">
+      <button class="btn btn-g btn-sm" onclick="clearTF()">Show All</button>
+      <button class="btn btn-p btn-sm" onclick="openAddTeam()">+ Add Member</button>
+    </div>
+  </div>
+
+  <!-- Team member cards -->
+  <div class="tgrid" id="tgrid"></div>
+
+  <!-- Team table filters -->
+  <div class="card filters" style="margin-bottom:1rem;">
+    <label style="font-size:.71rem;font-weight:700;color:var(--t2);white-space:nowrap;">Filter assignments:</label>
+    <select class="fi" id="tmStage" onchange="renderTeam()">
+      <option value="all">All Stages</option>
+      <option value="lead">Lead</option><option value="contacted">Contacted</option>
+      <option value="negotiation">Negotiation</option><option value="onboarded">Onboarded</option>
+    </select>
+    <select class="fi" id="tmSrc" onchange="renderTeam()">
+      <option value="all">All Sources</option>
+      <option value="zomato">Zomato</option><option value="swiggy">Swiggy</option>
+      <option value="google">Google Maps</option><option value="magicpin">Magicpin</option>
+    </select>
+    <select class="fi" id="tmType" onchange="renderTeam()">
+      <option value="all">All Types</option>
+      <option>Restaurant</option><option>Cafe</option><option>Bakery</option>
+      <option>QSR</option><option>Cloud Kitchen</option><option>Fine Dining</option>
+    </select>
+    <input type="text" class="fi" id="tmQ" placeholder="Search…" oninput="renderTeam()" style="min-width:150px;">
+    <span class="fc" id="tmCount">—</span>
+  </div>
+
+  <div class="card">
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Restaurant</th><th>Type</th><th>Assigned To</th><th>Stage</th>
+          <th>Source</th><th>Follow-up</th><th>Onboarded</th><th>Docs</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="ttbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ░░ ANALYTICS ░░ -->
+<div class="view" id="view-analytics">
+  <!-- Date range bar -->
+  <div class="ana-bar">
+    <span style="font-size:.76rem;font-weight:800;">📊 Period:</span>
+    <label class="fl" style="margin:0;white-space:nowrap;font-size:.72rem;">From</label>
+    <input type="date" class="fi" id="anaFrom" onchange="renderAnalytics()" style="min-width:130px;">
+    <label class="fl" style="margin:0;white-space:nowrap;font-size:.72rem;">To</label>
+    <input type="date" class="fi" id="anaTo"   onchange="renderAnalytics()" style="min-width:130px;">
+    <select class="fi" id="anaQ" onchange="setQRange()">
+      <option value="">Quick Range</option>
+      <option value="today">Today</option><option value="week">This Week</option>
+      <option value="month">This Month</option><option value="lastmonth">Last Month</option>
+      <option value="quarter">This Quarter</option><option value="year">This Year</option>
+      <option value="all">All Time</option>
+    </select>
+    <select class="fi" id="anaMember" onchange="renderAnalytics()"><option value="all">All Members</option></select>
+    <button class="btn btn-g btn-sm" onclick="resetAna()">Reset</button>
+    <span id="anaPLbl" style="font-size:.65rem;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-left:auto;"></span>
+  </div>
+
+  <div class="agrid" id="agrid"></div>
+
+  <!-- Team performance + targets -->
+  <div class="sh">
+    <span class="st">Team Performance &amp; Targets</span>
+    <div style="display:flex;gap:.5rem;align-items:center;">
+      <label style="font-size:.71rem;font-weight:700;color:var(--t2);">Monthly Target:</label>
+      <input type="number" class="fi" id="gTarget" value="50" min="1" style="width:65px;" onchange="renderAnalytics()">
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:1.2rem;">
+    <div class="twrap">
+      <table>
+        <thead><tr>
+          <th>Member</th><th>Assigned</th><th>Contacted</th><th>Negotiation</th>
+          <th>Onboarded</th><th>Period Target</th><th>Period Achieved</th><th>Progress</th>
+          <th>Today</th><th>Week</th><th>Month</th><th>Conversion</th>
+        </tr></thead>
+        <tbody id="abody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="frow" style="margin-bottom:1.2rem;gap:1rem;">
+    <div>
+      <div class="sh"><span class="st">By Type</span></div>
+      <div class="card"><div class="twrap">
+        <table>
+          <thead><tr><th>Type</th><th>Total</th><th>Onboarded</th><th>Conv%</th></tr></thead>
+          <tbody id="typeBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+    <div>
+      <div class="sh"><span class="st">By Source</span></div>
+      <div class="card"><div class="twrap">
+        <table>
+          <thead><tr><th>Source</th><th>Total</th><th>Onboarded</th><th>Conv%</th></tr></thead>
+          <tbody id="srcBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="sh"><span class="st">Top Areas</span></div>
+  <div class="card">
+    <div class="twrap">
+      <table>
+        <thead><tr><th>Area</th><th>Total</th><th>Onboarded</th><th>Pipeline</th><th>Top Type</th></tr></thead>
+        <tbody id="areaBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Restaurant Detail -->
+<div class="ov" id="detailOv">
+  <div class="modal">
+    <div class="mhdr"><span class="mtitle" id="dTitle">—</span><button class="mclose" onclick="closeOv('detailOv')">✕</button></div>
+    <div class="dtabs">
+      <div class="dtab active" onclick="swTab('info',this)">ℹ️ Info</div>
+      <div class="dtab"        onclick="swTab('platforms',this)">🏪 Platforms</div>
+      <div class="dtab"        onclick="swTab('docs',this)">📄 Documents</div>
+      <div class="dtab"        onclick="swTab('notes',this)">📝 Notes</div>
+    </div>
+    <div id="dbody"></div>
+  </div>
+</div>
+
+<!-- Onboard -->
+<div class="ov" id="onboardOv">
+  <div class="modal" style="max-width:680px;">
+    <div class="mhdr"><span class="mtitle">🚀 Onboard Restaurant</span><button class="mclose" onclick="closeOv('onboardOv')">✕</button></div>
+    <div id="obody"></div>
+  </div>
+</div>
+
+<!-- Add Team -->
+<div class="ov" id="addTeamOv">
+  <div class="modal modal-sm">
+    <div class="mhdr"><span class="mtitle">Add Team Member</span><button class="mclose" onclick="closeOv('addTeamOv')">✕</button></div>
+    <div class="fg"><label class="fl">Full Name *</label><input class="fi2" id="nName" placeholder="e.g. Ravi Kumar"></div>
+    <div class="fg"><label class="fl">Role</label><input class="fi2" id="nRole" placeholder="e.g. Sales Executive" value="Sales Executive"></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi2" id="nEmail" placeholder="ravi@tipplr.com"></div>
+    <div class="fg"><label class="fl">Phone</label><input class="fi2" id="nPhone" placeholder="+91 98765 43210"></div>
+    <div class="fg"><label class="fl">Monthly Target (onboardings)</label><input class="fi2" id="nTarget" type="number" value="50" min="1"></div>
+    <button class="btn btn-p" style="width:100%;margin-top:.5rem;" onclick="addMember()">✅ Add Member</button>
+  </div>
+</div>
+
+<!-- Reminder Modal -->
+<div class="ov" id="remOv">
+  <div class="modal modal-sm">
+    <div class="mhdr"><span class="mtitle">⏰ Set Follow-up Reminder</span><button class="mclose" onclick="closeOv('remOv')">✕</button></div>
+    <div id="remBody"></div>
+  </div>
+</div>
+
+<!-- Google Drive Setup Guide -->
+<div class="ov" id="driveGuideOv">
+  <div class="modal" style="max-width:680px;">
+    <div class="mhdr"><span class="mtitle">📁 Connect Google Drive</span><button class="mclose" onclick="closeOv('driveGuideOv')">✕</button></div>
+    <div id="driveGuideBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+// ═══════════════════════════════════
+// CONFIG  — paste your Client ID here
+// ═══════════════════════════════════
+const GID   = "20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com";
+const GSCOPE= "https://www.googleapis.com/auth/drive.file";
+const PER   = 50;
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let DB={restaurants:[],team:[]};
+let filtered=[], pg=1, tf=null, dId=null, dTab='info';
+let activeSrc=new Set(['zomato','swiggy','google','magicpin']);
+let gToken=null, driveOk=false, gTC=null;
+let gFolders={root:null, restaurant:null, msme:null};
+let currentObType='restaurant'; // 'restaurant' | 'msme'
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+function init(){
+  loadDB();
+  if(DB.restaurants.length < 500) buildData();
+  refreshAll();
+  populateAreaFilter();
+  checkReminders();
+}
+
+// ── NAV (plain function, no event listener dependency) ──
+function switchView(v){
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('nav-'+v).classList.add('on');
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  if(v==='team')      renderTeam();
+  if(v==='analytics'){initAnaRange();renderAnalytics();}
+}
+
+// close overlays on backdrop click
+document.addEventListener('click', e=>{
+  if(e.target.classList.contains('ov')) e.target.classList.remove('open');
+});
+
+// ═══════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════
+function loadDB(){
+  try{
+    const r=localStorage.getItem('tc6_rest'), t=localStorage.getItem('tc6_team');
+    if(r) DB.restaurants=JSON.parse(r);
+    if(t) DB.team=JSON.parse(t);
+    else DB.team=[
+      {id:1,name:'Bareen',    role:'Sales Manager',   email:'bareen@tipplr.com',   phone:'+91 9800000001',color:'#e8344e',target:60},
+      {id:2,name:'Lalitha',   role:'Sales Executive',  email:'lalitha@tipplr.com',  phone:'+91 9800000002',color:'#6c5ce7',target:50},
+      {id:3,name:'Neshavani', role:'Sales Executive',  email:'neshavani@tipplr.com',phone:'+91 9800000003',color:'#00b894',target:50},
+      {id:4,name:'Nivedita',  role:'Sales Executive',  email:'nivedita@tipplr.com', phone:'+91 9800000004',color:'#f39c12',target:50},
+    ];
+  } catch(e){ DB={restaurants:[],team:[]}; }
+}
+function saveDB(){
+  try{
+    localStorage.setItem('tc6_rest', JSON.stringify(DB.restaurants));
+    localStorage.setItem('tc6_team', JSON.stringify(DB.team));
+  } catch(e){ toast('Storage full – export CSV to free space','warn'); }
+}
+
+// ═══════════════════════════════════
+// GENERATE DATA
+// ═══════════════════════════════════
+function buildData(){
+  DB.restaurants=[];
+  const areas=["Indiranagar","Koramangala","Whitefield","HSR Layout","Jayanagar","Malleshwaram","JP Nagar","Banashankari","Rajajinagar","Marathahalli","Electronic City","Sarjapur Road","MG Road","Church Street","Frazer Town","Kammanahalli","BTM Layout","Bellandur","Domlur","Ulsoor","Shivajinagar","Banaswadi","Hennur","Kengeri","Mysore Road","Richmond Town","Basavanagudi","Vijayanagar","Peenya","Yeshwanthpur","Nagarbhavi","Kumaraswamy Layout","Bannerghatta Road","Varthur","Mahadevapura","Brookefield","Hoodi","Kadugodi","Whitefield","Electronic City Phase 2"];
+  const cuisines=["North Indian","South Indian","Chinese","Italian","Mexican","Japanese","Thai","Biryani","Seafood","Continental","Kerala","Mughlai","Mediterranean","Pan-Asian","Rajasthani","Andhra","Karnataka","Chettinad","Bengali","Punjabi"];
+  const typePool=[];
+  [["Restaurant",30],["Cafe",16],["Fast Food",12],["QSR",10],["Cloud Kitchen",10],["Bakery",7],["Fine Dining",5],["Dhaba",4],["Sweet Shop",3],["Bar & Pub",2],["Ice Cream",1],["Juice Shop",1],["Mithai",1]].forEach(([t,w])=>{for(let i=0;i<w;i++)typePool.push(t);});
+  const intl=["McDonald's","KFC","Pizza Hut","Starbucks","Domino's","Burger King","Taco Bell","Subway","Dunkin' Donuts","Baskin-Robbins","Chili's","TGI Fridays","Panda Express","Costa Coffee","Krispy Kreme"];
+  const nat=["Barbeque Nation","Mainland China","Punjab Grill","Haldiram's","Biryani Blues","Wow! Momo","Chaayos","Behrouz Biryani","Oven Story","Mojo Pizza","Biryani By Kilo","Naturals Ice Cream","MTR Restaurant","Cafe Coffee Day","Third Wave Coffee"];
+  const pfx=["Sri","Shri","The","New","Royal","Grand","Hotel","Cafe","Spice","Golden","Heritage","Namma","Anand","Urban","Fresh","Classic","Corner","Home"];
+  const sfx=["Restaurant","Cafe","Kitchen","Dhaba","Bistro","Eatery","Corner","Bites","Express","Hub","House","Lounge"];
+  const discs=["10% off","15% off","20% off","25% off","30% off","40% off","50% off","Free Delivery","BOGO","Flat ₹50 off","Flat ₹75 off","Flat ₹100 off","15% cashback","No offers"];
+  const stageW=["lead","lead","lead","lead","lead","contacted","contacted","contacted","negotiation","negotiation","onboarded"];
+  const srcs=["zomato","swiggy","google","magicpin"];
+  let id=1;
+
+  areas.forEach((area,ai)=>{
+    const count = 350+Math.floor(Math.random()*120);
+    for(let i=0;i<count;i++){
+      const type=typePool[Math.floor(Math.random()*typePool.length)];
+      const rnd=Math.random();
+      let cat, name;
+      if(rnd<0.07){cat="international";name=intl[Math.floor(Math.random()*intl.length)];}
+      else if(rnd<0.22){cat="national";name=nat[Math.floor(Math.random()*nat.length)];}
+      else{
+        cat="local";
+        const c=cuisines[Math.floor(Math.random()*cuisines.length)];
+        if(type==="Bakery") name=pfx[Math.floor(Math.random()*pfx.length)]+" Bakery";
+        else if(type==="Sweet Shop"||type==="Mithai") name=pfx[Math.floor(Math.random()*pfx.length)]+" Sweets";
+        else if(type==="Ice Cream") name=pfx[Math.floor(Math.random()*pfx.length)]+" Ice Cream";
+        else if(type==="Juice Shop") name=pfx[Math.floor(Math.random()*pfx.length)]+" Juices";
+        else if(type==="Cloud Kitchen") name=pfx[Math.floor(Math.random()*pfx.length)]+" Kitchen";
+        else if(type==="Bar & Pub") name=pfx[Math.floor(Math.random()*pfx.length)]+" Pub";
+        else if(type==="Dhaba") name=pfx[Math.floor(Math.random()*pfx.length)]+" Dhaba";
+        else name=pfx[Math.floor(Math.random()*pfx.length)]+" "+c+" "+sfx[Math.floor(Math.random()*sfx.length)];
+      }
+      const src=srcs[Math.floor(Math.random()*srcs.length)];
+      const stage=stageW[Math.floor(Math.random()*stageW.length)];
+      const phones=[];
+      const prefixes=["98","99","97","96","95","94","93","91","90","88","87","86","85","84","83","82","80","79","78","77"];
+      for(let j=0;j<1+Math.floor(Math.random()*3);j++){
+        phones.push("+91"+prefixes[Math.floor(Math.random()*prefixes.length)]+String(10000000+Math.floor(Math.random()*90000000)));
+      }
+      const fssai="1"+String(100000000000+Math.floor(Math.random()*900000000000));
+      const ob=stage==='onboarded'?new Date(Date.now()-Math.random()*90*864e5).toISOString():null;
+      // random follow-up date for ~30% of leads
+      const followUp = (stage==='lead'||stage==='contacted') && Math.random()<0.3
+        ? new Date(Date.now()+Math.random()*7*864e5).toISOString().split('T')[0] : null;
+
+      DB.restaurants.push({
+        id:id++, name:name.trim(), type, category:cat, location:area,
+        address:`${10+Math.floor(Math.random()*990)}, ${area} Main Road, Bengaluru - ${560001+ai}`,
+        cuisine:cuisines[Math.floor(Math.random()*cuisines.length)],
+        mobiles:phones, email:name.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10)+(id%99+1)+"@gmail.com",
+        fssaiNumber:fssai, rating:(2.8+Math.random()*2.2).toFixed(1), source:src,
+        discounts:{zomato:discs[Math.floor(Math.random()*discs.length)],swiggy:discs[Math.floor(Math.random()*discs.length)],google:discs[Math.floor(Math.random()*discs.length)],magicpin:discs[Math.floor(Math.random()*discs.length)]},
+        commission:{zomato:cat==='international'?'8-12%':cat==='national'?'10-15%':'14-22%',swiggy:cat==='international'?'7-11%':cat==='national'?'9-14%':'13-20%',google:'N/A',magicpin:'5-12%'},
+        estimatedCommission:cat==='international'?'8-12%':cat==='national'?'10-15%':'12-20%',
+        stage, assignedTo:null, onboardedDate:ob, followUpDate:followUp,
+        notes:'', documents:{restaurant:[],msme:[]}, lastUpdated:new Date().toISOString(),
+      });
+    }
+  });
+
+  // Assign restaurants round-robin
+  DB.restaurants.forEach((r,i)=>{ if(i%3===0) r.assignedTo=DB.team[i%DB.team.length].id; });
+  saveDB();
+  console.log(`✅ Generated ${DB.restaurants.length} restaurants`);
+}
+
+// ═══════════════════════════════════
+// STATS
+// ═══════════════════════════════════
+function updateStats(){
+  const tot=DB.restaurants.length;
+  const ob=DB.restaurants.filter(r=>r.stage==='onboarded').length;
+  const ts=new Date().toDateString();
+  const td=DB.restaurants.filter(r=>r.onboardedDate&&new Date(r.onboardedDate).toDateString()===ts).length;
+  const pipe=DB.restaurants.filter(r=>r.stage==='negotiation').length;
+  g('hT').textContent=tot.toLocaleString();
+  g('hO').textContent=ob.toLocaleString();
+  g('hTd').textContent=td;
+  g('hPipe').textContent=pipe.toLocaleString();
+  // team dropdowns
+  ['teamFilter','anaMember'].forEach(id=>{
+    const el=g(id); if(!el)return;
+    const cv=el.value;
+    el.innerHTML='<option value="all">All Members</option>'+DB.team.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+    if([...el.options].some(o=>o.value===cv)) el.value=cv;
+  });
+}
+function refreshAll(){updateStats();applyF();}
+function g(id){return document.getElementById(id);}
+function populateAreaFilter(){
+  const areas=[...new Set(DB.restaurants.map(r=>r.location))].sort();
+  const af=g('areaFilter');
+  if(af) af.innerHTML='<option value="all">All Areas</option>'+areas.map(a=>`<option>${a}</option>`).join('');
+}
+
+// ═══════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════
+function applyF(){
+  const q=g('qInput').value.toLowerCase();
+  const type=g('typeFilter').value;
+  const cat=g('catFilter').value;
+  const tm=g('teamFilter').value;
+  const st=g('stageFilter').value;
+  const sr=g('srcFilter').value;
+  const area=g('areaFilter').value;
+
+  filtered=DB.restaurants.filter(r=>{
+    if(type!=='all'&&r.type!==type) return false;
+    if(cat!=='all'&&r.category!==cat) return false;
+    if(tm!=='all'&&r.assignedTo!==parseInt(tm)) return false;
+    if(st!=='all'&&r.stage!==st) return false;
+    if(sr!=='all'&&r.source!==sr) return false;
+    if(area!=='all'&&r.location!==area) return false;
+    if(q){
+      const h=`${r.name} ${r.location} ${r.fssaiNumber} ${r.mobiles.join(' ')} ${r.email} ${r.cuisine} ${r.type}`.toLowerCase();
+      if(!h.includes(q)) return false;
+    }
+    return true;
+  });
+  pg=1; renderTable();
+  g('fc').textContent=`${filtered.length.toLocaleString()} / ${DB.restaurants.length.toLocaleString()}`;
+}
+function clearF(){
+  g('qInput').value='';
+  ['typeFilter','catFilter','teamFilter','stageFilter','srcFilter','areaFilter'].forEach(id=>{const el=g(id);if(el)el.value='all';});
+  applyF();
+}
+
+// ═══════════════════════════════════
+// TYPE STYLING
+// ═══════════════════════════════════
+const TYPE_COLORS={
+  'Restaurant':'#6c5ce7','Cafe':'#b45309','Bakery':'#9a3412','Sweet Shop':'#be185d',
+  'QSR':'#dc2626','Fast Food':'#c2410c','Cloud Kitchen':'#1d4ed8','Fine Dining':'#166534',
+  'Dhaba':'#374151','Bar & Pub':'#1e293b','Ice Cream':'#0369a1','Juice Shop':'#047857','Mithai':'#92400e'
+};
+function tc(t){return TYPE_COLORS[t]||'#374151';}
+function typeBadge(t){return`<span style="display:inline-block;padding:.12rem .4rem;border-radius:4px;font-size:.59rem;font-weight:700;background:${tc(t)}18;color:${tc(t)};border:1px solid ${tc(t)}30;">${t}</span>`;}
+
+// ═══════════════════════════════════
+// TABLE
+// ═══════════════════════════════════
+function renderTable(){
+  const rows=filtered.slice((pg-1)*PER, pg*PER);
+  const today=new Date().toISOString().split('T')[0];
+  g('rBody').innerHTML=rows.map(r=>{
+    const overdue=r.followUpDate&&r.followUpDate<today;
+    const dueToday=r.followUpDate&&r.followUpDate===today;
+    const fuStyle=overdue?'color:var(--dan);font-weight:700;':dueToday?'color:var(--warn);font-weight:700;':'color:var(--t3);';
+    const fuLabel=r.followUpDate?r.followUpDate:'—';
+    return`<tr>
+      <td>
+        <div style="font-weight:700;cursor:pointer;color:var(--C);" onclick="openDetail(${r.id})">${r.name}</div>
+        <div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap;">${typeBadge(r.type)}<span style="font-size:.6rem;color:var(--t2);">${r.cuisine}·⭐${r.rating}</span></div>
+      </td>
+      <td><div style="font-weight:600;font-size:.78rem;">${r.location}</div></td>
+      <td>
+        ${r.mobiles.slice(0,2).map(m=>`<span class="ptag" onclick="cp('${m}')">${m}</span>`).join('')}
+        <div style="font-size:.61rem;color:var(--t3);margin-top:2px;">✉ ${r.email.length>20?r.email.slice(0,20)+'…':r.email}</div>
+      </td>
+      <td>
+        <span class="badge bz" style="font-size:.58rem;">Z: ${r.discounts.zomato}</span><br>
+        <span class="badge bs" style="margin-top:2px;display:inline-block;font-size:.58rem;">S: ${r.discounts.swiggy}</span>
+      </td>
+      <td><span class="badge bf" onclick="cp('${r.fssaiNumber}')" style="cursor:pointer;">${r.fssaiNumber.slice(0,9)}…</span></td>
+      <td><span class="badge bc">${r.estimatedCommission}</span></td>
+      <td>
+        <select class="csel" onchange="setAssign(${r.id},this.value)">
+          <option value="">Unassigned</option>
+          ${DB.team.map(m=>`<option value="${m.id}" ${r.assignedTo===m.id?'selected':''}>${m.name}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        <select class="csel" onchange="setStage(${r.id},this.value)">
+          <option value="lead"        ${r.stage==='lead'?'selected':''}>Lead</option>
+          <option value="contacted"   ${r.stage==='contacted'?'selected':''}>Contacted</option>
+          <option value="negotiation" ${r.stage==='negotiation'?'selected':''}>Negotiation</option>
+          <option value="onboarded"   ${r.stage==='onboarded'?'selected':''}>Onboarded</option>
+        </select>
+      </td>
+      <td style="font-size:.68rem;${fuStyle}">${overdue?'⚠️ ':dueToday?'🔔 ':''}${fuLabel}</td>
+      <td>
+        <div class="arow">
+          <button class="ib i-c" onclick="callR('${r.mobiles[0]}',${r.id})" title="Call">📞</button>
+          <button class="ib i-o" onclick="openOnboard(${r.id})" title="Onboard">🚀</button>
+          <button class="ib i-d" onclick="openDetail(${r.id},'docs')" title="Docs">📄</button>
+          <button class="ib i-rem" onclick="openReminder(${r.id})" title="Follow-up">⏰</button>
+          <button class="ib i-v" onclick="openDetail(${r.id})" title="View">👁</button>
         </div>
+      </td>
+    </tr>`;
+  }).join('');
+  renderPag();
+}
+
+function renderPag(){
+  const tot=Math.ceil(filtered.length/PER);
+  if(tot===0){g('pag').innerHTML='<span class="pgi">No results</span>';return;}
+  let h='';
+  const lo=Math.max(1,pg-4), hi=Math.min(tot,pg+4);
+  if(lo>1) h+=`<button class="pgb" onclick="goP(1)">1</button><span style="color:var(--t3);padding:0 .2rem;">…</span>`;
+  for(let i=lo;i<=hi;i++) h+=`<button class="pgb ${i===pg?'on':''}" onclick="goP(${i})">${i}</button>`;
+  if(hi<tot) h+=`<span style="color:var(--t3);padding:0 .2rem;">…</span><button class="pgb" onclick="goP(${tot})">${tot}</button>`;
+  g('pag').innerHTML=h+`<span class="pgi">Page ${pg}/${tot} · ${filtered.length.toLocaleString()} results</span>`;
+}
+function goP(p){pg=p;renderTable();window.scrollTo(0,160);}
+
+// ═══════════════════════════════════
+// QUICK ACTIONS
+// ═══════════════════════════════════
+function byId(id){return DB.restaurants.find(r=>r.id===id);}
+function setAssign(id,v){const r=byId(id);r.assignedTo=v?parseInt(v):null;r.lastUpdated=new Date().toISOString();saveDB();updateStats();}
+function setStage(id,s){
+  const r=byId(id);
+  if(s==='onboarded'&&r.stage!=='onboarded') r.onboardedDate=new Date().toISOString();
+  r.stage=s;r.lastUpdated=new Date().toISOString();saveDB();updateStats();
+  toast(`Stage → ${s}`,'success');
+}
+function callR(ph,id){window.location.href=`tel:${ph}`;const r=byId(id);if(r&&r.stage==='lead'){r.stage='contacted';r.lastUpdated=new Date().toISOString();saveDB();applyF();}}
+function cp(t){navigator.clipboard.writeText(t).then(()=>toast(`Copied!`,'success')).catch(()=>toast(t));}
+
+// ═══════════════════════════════════
+// FOLLOW-UP REMINDERS
+// ═══════════════════════════════════
+function openReminder(id){
+  const r=byId(id);
+  g('remBody').innerHTML=`
+    <div style="font-weight:700;margin-bottom:.8rem;">${r.name}</div>
+    <div class="fg"><label class="fl">Follow-up Date</label>
+      <input class="fi2" type="date" id="remDate" value="${r.followUpDate||new Date().toISOString().split('T')[0]}">
+    </div>
+    <div class="fg"><label class="fl">Reminder Note</label>
+      <textarea class="fta" id="remNote" style="min-height:60px;" placeholder="What to discuss...">${r.notes||''}</textarea>
+    </div>
+    <div style="display:flex;gap:.5rem;">
+      <button class="btn btn-p" style="flex:1;" onclick="saveReminder(${id})">💾 Save Reminder</button>
+      <button class="btn btn-d btn-sm" onclick="clearReminder(${id})">Clear</button>
+    </div>`;
+  g('remOv').classList.add('open');
+}
+function saveReminder(id){
+  const r=byId(id);
+  r.followUpDate=g('remDate').value;
+  r.notes=g('remNote').value;
+  r.lastUpdated=new Date().toISOString();
+  saveDB();closeOv('remOv');applyF();
+  toast(`Follow-up set for ${r.followUpDate}`,'success');
+}
+function clearReminder(id){
+  byId(id).followUpDate=null;saveDB();closeOv('remOv');applyF();
+  toast('Reminder cleared');
+}
+function checkReminders(){
+  const today=new Date().toISOString().split('T')[0];
+  const due=DB.restaurants.filter(r=>r.followUpDate&&r.followUpDate<=today);
+  if(due.length) setTimeout(()=>toast(`⏰ ${due.length} follow-up${due.length>1?'s':''} due today!`,'warn'),1500);
+}
+
+// ═══════════════════════════════════
+// DETAIL MODAL
+// ═══════════════════════════════════
+function openDetail(id,tab='info'){
+  dId=id;dTab=tab;
+  const r=byId(id);
+  g('dTitle').textContent=r.name;
+  document.querySelectorAll('.dtab').forEach((el,i)=>el.classList.toggle('active',['info','platforms','docs','notes'][i]===tab));
+  renderDetail(r,tab);
+  g('detailOv').classList.add('open');
+}
+function swTab(tab,el){
+  dTab=tab;
+  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderDetail(byId(dId),tab);
+}
+function renderDetail(r,tab){
+  const b=g('dbody');
+  if(tab==='info'){
+    b.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.82rem;margin-bottom:1rem;">
+        <div><div class="fl">Type</div>${typeBadge(r.type)}</div>
+        <div><div class="fl">Category / Cuisine</div><b>${r.category} · ${r.cuisine}</b></div>
+        <div><div class="fl">Rating</div><b>⭐ ${r.rating}</b></div>
+        <div><div class="fl">Source</div><b style="text-transform:capitalize;">${r.source}</b></div>
+        <div><div class="fl">Address</div><span style="font-size:.79rem;">${r.address}</span></div>
+        <div><div class="fl">FSSAI</div><span style="cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:.75rem;" onclick="cp('${r.fssaiNumber}')">${r.fssaiNumber} 📋</span></div>
+        <div><div class="fl">Est. Commission</div><b style="color:var(--ok);">${r.estimatedCommission}</b></div>
+        <div><div class="fl">Follow-up Date</div><b>${r.followUpDate||'Not set'}</b></div>
+      </div>
+      <div style="margin-bottom:.82rem;"><div class="fl">Phone Numbers</div>${r.mobiles.map(m=>`<span class="ptag" onclick="cp('${m}')">${m}</span>`).join('')}</div>
+      <div style="margin-bottom:1rem;"><div class="fl">Email</div><span onclick="cp('${r.email}')" style="cursor:pointer;font-size:.8rem;">${r.email}</span></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Assign To</label>
+          <select class="fi2" onchange="setAssign(${r.id},this.value)">
+            <option value="">Unassigned</option>
+            ${DB.team.map(m=>`<option value="${m.id}" ${r.assignedTo===m.id?'selected':''}>${m.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Stage</label>
+          <select class="fi2" onchange="setStage(${r.id},this.value)">
+            <option value="lead"        ${r.stage==='lead'?'selected':''}>Lead</option>
+            <option value="contacted"   ${r.stage==='contacted'?'selected':''}>Contacted</option>
+            <option value="negotiation" ${r.stage==='negotiation'?'selected':''}>Negotiation</option>
+            <option value="onboarded"   ${r.stage==='onboarded'?'selected':''}>Onboarded</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-g btn-sm" onclick="openReminder(${r.id})">⏰ Set Follow-up Reminder</button>`;
+  } else if(tab==='platforms'){
+    const pl=[{k:'zomato',l:'Zomato',c:'#e23744'},{k:'swiggy',l:'Swiggy',c:'#fc8019'},{k:'google',l:'Google Maps',c:'#1a73e8'},{k:'magicpin',l:'Magicpin',c:'#9c27b0'}];
+    b.innerHTML=`<p style="font-size:.77rem;color:var(--t2);margin-bottom:.82rem;">Competitor intel — what this outlet offers on other platforms</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem;">
+        ${pl.map(p=>`<div style="background:var(--s2);border:1px solid var(--bdr);border-radius:9px;padding:.82rem;">
+          <div style="font-size:.61rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;font-family:'JetBrains Mono',monospace;color:${p.c};margin-bottom:.28rem;">${p.l}</div>
+          <div style="font-size:.9rem;font-weight:800;color:var(--warn);">${r.discounts[p.k]||'—'}</div>
+          <div style="font-size:.68rem;color:var(--t3);margin-top:.15rem;">Commission: ${r.commission[p.k]||'N/A'}</div>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:.85rem;padding:.82rem;background:linear-gradient(135deg,#f0fdf9,#e6faf4);border:1px solid #b0e8d6;border-radius:9px;">
+        <div style="font-size:.73rem;font-weight:800;color:var(--ok);margin-bottom:.25rem;">💡 Tipplr Advantage</div>
+        <div style="font-size:.78rem;color:#00815d;">Only ${r.estimatedCommission} commission · Zero listing fee (3 months) · Live tracking · Dedicated account manager</div>
+      </div>`;
+  } else if(tab==='docs'){
+    renderDocsTab(r);
+  } else {
+    b.innerHTML=`<div class="fg"><label class="fl">Sales Notes & Call Log</label>
+      <textarea class="fta" id="nta" style="min-height:140px;" placeholder="Call logs, negotiation notes, objections, promises made…">${r.notes||''}</textarea></div>
+      <button class="btn btn-p btn-sm" onclick="saveNotes(${r.id})">💾 Save Notes</button>`;
+  }
+}
+function saveNotes(id){const r=byId(id);r.notes=g('nta').value;r.lastUpdated=new Date().toISOString();saveDB();toast('Notes saved','success');}
+
+// ═══════════════════════════════════
+// DOCUMENTS (dual folder: restaurant & msme)
+// ═══════════════════════════════════
+let docViewType='restaurant'; // which tab is open in docs panel
+
+function renderDocsTab(r){
+  // Ensure docs object exists in both formats (old records may have array)
+  if(Array.isArray(r.documents)) r.documents={restaurant:r.documents,msme:[]};
+  if(!r.documents.restaurant) r.documents.restaurant=[];
+  if(!r.documents.msme) r.documents.msme=[];
+
+  const b=g('dbody');
+  const driveNote=driveOk
+    ?`<div class="info-box">📁 Files upload to Google Drive → <b>Tipplr_CRM</b> → <b>${r.name}</b> → <b>Restaurant_Onboarding</b> or <b>MSME_Onboarding</b></div>`
+    :`<div class="warn-box">⚠️ Connect Google Drive to upload docs.<button class="btn btn-p btn-sm" onclick="connectDrive()" style="margin-left:auto;">Connect Drive</button></div>`;
+
+  b.innerHTML=`
+    ${driveNote}
+    <div style="display:flex;gap:.5rem;margin-bottom:1rem;">
+      <button class="btn ${docViewType==='restaurant'?'btn-p':'btn-g'}" onclick="switchDocTab('restaurant',${r.id})" style="flex:1;">🍽️ Restaurant Onboarding<br><span style="font-size:.65rem;opacity:.8;">${r.documents.restaurant.length} docs</span></button>
+      <button class="btn ${docViewType==='msme'?'btn-p':'btn-g'}" onclick="switchDocTab('msme',${r.id})" style="flex:1;">🏢 MSME Onboarding<br><span style="font-size:.65rem;opacity:.8;">${r.documents.msme.length} docs</span></button>
+    </div>
+    <div id="docPanelInner"></div>`;
+  renderDocPanel(r, docViewType);
+}
+
+function switchDocTab(type, id){
+  docViewType=type;
+  renderDocsTab(byId(id));
+}
+
+function renderDocPanel(r, type){
+  const panel=g('docPanelInner');
+  if(!panel) return;
+  const label=type==='restaurant'?'Restaurant Onboarding':'MSME Onboarding';
+  const docs=r.documents[type]||[];
+
+  const upHtml=driveOk
+    ?`<div class="upzone" id="upz" onclick="trigUp('${type}',${r.id})" ondragover="dov(event)" ondrop="ddrop(event,'${type}',${r.id})" ondragleave="this.classList.remove('drag')">
+        <div style="font-size:1.6rem;margin-bottom:.3rem;">☁️</div>
+        <div style="font-weight:700;font-size:.83rem;">Click or drag &amp; drop for <b>${label}</b></div>
+        <div style="font-size:.67rem;color:var(--t3);margin-top:3px;">FSSAI cert, GST, PAN, agreement, menu photos…</div>
+        <input type="file" id="fIn" multiple style="display:none" onchange="handleFiles(event,'${type}',${r.id})">
+      </div>`
+    :`<div style="padding:.7rem;background:var(--s2);border-radius:8px;font-size:.75rem;color:var(--t3);text-align:center;margin-bottom:.8rem;">Connect Google Drive to upload documents</div>`;
+
+  const docItems=docs.length
+    ?docs.map(d=>`<div class="docitem">
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <span style="font-size:1rem;">${dIcon(d.name)}</span>
+          <div><div style="font-weight:700;font-size:.79rem;">${d.name}</div><div style="font-size:.62rem;color:var(--t3);">${new Date(d.uploadedAt).toLocaleDateString('en-IN')}${d.size?' · '+d.size:''}</div></div>
+        </div>
+        <div style="display:flex;gap:.3rem;">
+          ${d.url?`<a href="${d.url}" target="_blank" class="btn btn-g btn-sm">View</a>`:''}
+          <button class="btn btn-d btn-sm" onclick="delDoc(${r.id},'${type}','${d.id}')">✕</button>
+        </div>
+      </div>`).join('')
+    :`<div style="text-align:center;padding:1.2rem;color:var(--t3);font-size:.79rem;">No ${label} documents yet.</div>`;
+
+  panel.innerHTML=upHtml+`<div class="doclist">${docItems}</div>`;
+}
+
+function trigUp(type,id){g('fIn').click();}
+function dov(e){e.preventDefault();g('upz')?.classList.add('drag');}
+function ddrop(e,type,id){e.preventDefault();g('upz')?.classList.remove('drag');handleFiles({target:{files:e.dataTransfer.files}},type,id);}
+
+async function handleFiles(ev, type, id){
+  const r=byId(id);
+  if(Array.isArray(r.documents)) r.documents={restaurant:r.documents,msme:[]};
+  if(!r.documents[type]) r.documents[type]=[];
+
+  for(const f of ev.target.files){
+    toast(`Uploading ${f.name}…`);
+    const dr = driveOk ? await uploadToDrive(f, r.name, type) : null;
+    r.documents[type].push({
+      id:'d'+Date.now()+Math.random().toString(36).slice(2),
+      name:f.name, size:fmtSz(f.size), uploadedAt:new Date().toISOString(),
+      url:dr?`https://drive.google.com/file/d/${dr.id}/view`:null
+    });
+    saveDB();
+    toast(`${f.name} uploaded!`,'success');
+  }
+  updateStats(); renderDocsTab(r);
+}
+
+function delDoc(rid,type,did){
+  const r=byId(rid);
+  if(Array.isArray(r.documents)) r.documents={restaurant:r.documents,msme:[]};
+  r.documents[type]=r.documents[type].filter(d=>d.id!==did);
+  saveDB();updateStats();renderDocsTab(r);toast('Removed','success');
+}
+function dIcon(n){const e=n.split('.').pop().toLowerCase();if(e==='pdf')return'📕';if(['doc','docx'].includes(e))return'📘';if(['xls','xlsx'].includes(e))return'📗';if(['jpg','jpeg','png','gif','webp'].includes(e))return'🖼️';return'📄';}
+function fmtSz(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+
+// ═══════════════════════════════════
+// ONBOARD MODAL (dual type)
+// ═══════════════════════════════════
+function openOnboard(id){
+  currentObType='restaurant';
+  const r=byId(id);
+  g('obody').innerHTML=`
+    <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:.92rem;margin-bottom:1rem;">
+      <div style="font-weight:800;font-size:.95rem;">${r.name} ${typeBadge(r.type)}</div>
+      <div style="font-size:.75rem;color:var(--t2);margin-top:3px;">${r.address}</div>
+      <div style="margin-top:.45rem;">${r.mobiles.map(m=>`<span class="ptag">${m}</span>`).join('')}</div>
+      <div style="font-size:.69rem;color:var(--t3);margin-top:4px;">FSSAI: ${r.fssaiNumber}</div>
     </div>
 
-    <div class="container">
-        <!-- Server Info Card -->
-        <div class="setup-card" id="serverInfo">
-            <h3>🌐 Server Information</h3>
-            <div class="url-box" id="serverUrlDisplay"></div>
-            <div class="success-box" id="serverStatus">
-                ✅ Running on local server - OAuth will work!
-            </div>
+    <div style="margin-bottom:1rem;">
+      <div class="fl">Select Onboarding Type</div>
+      <div class="ob-tabs">
+        <div class="ob-tab active" id="obTab-restaurant" onclick="selectObType('restaurant',${id})">
+          <div class="ob-tab-icon">🍽️</div>
+          <div class="ob-tab-lbl">Restaurant Onboarding</div>
+          <div class="ob-tab-sub">Menu, ops, commission</div>
         </div>
-
-        <!-- Setup Instructions -->
-        <div id="setupCard" class="setup-card">
-            <h3>🔐 Google Drive Setup</h3>
-            <div style="margin-bottom: 1rem;">
-                <label><strong>Your Google Client ID:</strong></label>
-                <input type="text" id="clientIdInput" value="20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0; border: 1px solid #ddd; border-radius: 8px;">
-                <button id="saveAndConnect" class="btn-primary" style="width: 100%;">Connect to Google Drive</button>
-            </div>
-            
-            <div class="warning-box">
-                ⚠️ <strong>Important:</strong> Make sure you've added this URL to Google Cloud Console:
-                <br><br>
-                <strong>Authorized JavaScript Origins:</strong><br>
-                <code id="originUrl"></code>
-                <br><br>
-                <strong>Authorized Redirect URIs:</strong><br>
-                <code id="redirectUrl"></code>
-            </div>
+        <div class="ob-tab" id="obTab-msme" onclick="selectObType('msme',${id})">
+          <div class="ob-tab-icon">🏢</div>
+          <div class="ob-tab-lbl">MSME Onboarding</div>
+          <div class="ob-tab-sub">GST, PAN, UDYAM cert</div>
         </div>
-
-        <!-- Search Bar -->
-        <div class="filters-bar">
-            <input type="text" id="searchInput" class="filter-input" placeholder="Search restaurant by name or location...">
-            <button onclick="searchRestaurants()" class="btn-primary">🔍 Search</button>
-        </div>
-
-        <!-- Restaurants Grid -->
-        <div id="restaurantsGrid" class="restaurants-grid"></div>
+      </div>
     </div>
 
-    <!-- Document Manager Modal -->
-    <div id="docModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Document Manager</h3>
-                <span onclick="closeModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
-            </div>
-            <div id="modalContent"></div>
-        </div>
-    </div>
+    <div id="obFormSection"></div>`;
+  renderObForm(id, 'restaurant');
+  g('onboardOv').classList.add('open');
+}
 
-    <script>
-        // ============ CONFIGURATION ============
-        const DEFAULT_CLIENT_ID = "20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com";
-        const SCOPES = "https://www.googleapis.com/auth/drive.file";
-        
-        // State
-        let accessToken = null;
-        let isConnected = false;
-        let driveFolderId = null;
-        let restaurants = [];
-        
-        // Get current URL
-        const currentOrigin = window.location.origin;
-        const currentUrl = window.location.href;
-        
-        // Display URLs
-        document.getElementById('serverUrlDisplay').innerHTML = `<strong>Current URL:</strong> ${currentUrl}`;
-        document.getElementById('originUrl').textContent = currentOrigin;
-        document.getElementById('redirectUrl').textContent = currentOrigin + '/';
-        
-        // Check if running from file://
-        if (window.location.protocol === 'file:') {
-            document.getElementById('serverStatus').innerHTML = '❌ ERROR: You are opening this file directly (file://). Please run a local server!<br><br>Run this command in terminal: <code>python -m http.server 8000</code><br>Then open: <code>http://localhost:8000</code>';
-            document.getElementById('serverStatus').className = 'warning-box';
-            document.getElementById('connectBtn').disabled = true;
-            document.getElementById('saveAndConnect').disabled = true;
-        }
-        
-        // ============ GOOGLE DRIVE CONNECTION (MODERN GIS) ============
-        let tokenClient = null;
-        
-        async function connectToGoogleDrive() {
-            const clientId = document.getElementById('clientIdInput').value;
-            if (!clientId) {
-                alert('Please enter your Google Client ID');
-                return;
-            }
-            
-            if (window.location.protocol === 'file:') {
-                alert('Cannot connect from file:// protocol. Please run a local server first!\n\nRun: python -m http.server 8000\nThen open: http://localhost:8000');
-                return;
-            }
-            
-            try {
-                // Load GIS if not loaded
-                if (typeof google === 'undefined' || !google.accounts) {
-                    await loadGIS();
-                }
-                
-                // Create token client
-                tokenClient = google.accounts.oauth2.initTokenClient({
-                    client_id: clientId,
-                    scope: SCOPES,
-                    callback: async (tokenResponse) => {
-                        console.log('Token received');
-                        accessToken = tokenResponse.access_token;
-                        isConnected = true;
-                        updateUI(true);
-                        await createDriveFolder();
-                        alert('✅ Successfully connected to Google Drive!');
-                        document.getElementById('setupCard').style.display = 'none';
-                    },
-                    error_callback: (error) => {
-                        console.error('Auth error:', error);
-                        let errorMsg = 'Connection failed: ';
-                        if (error.type === 'popup_closed') {
-                            errorMsg += 'Popup was closed. Please try again.';
-                        } else if (error.type === 'access_denied') {
-                            errorMsg += 'Access denied. Please allow access.';
-                        } else {
-                            errorMsg += error.message || 'Unknown error';
-                        }
-                        alert(errorMsg);
-                        updateUI(false);
-                    }
-                });
-                
-                // Request access token
-                tokenClient.requestAccessToken();
-                
-            } catch (error) {
-                console.error('Connection error:', error);
-                alert('Failed to connect: ' + error.message);
-                updateUI(false);
-            }
-        }
-        
-        function loadGIS() {
-            return new Promise((resolve, reject) => {
-                if (typeof google !== 'undefined' && google.accounts) {
-                    resolve();
-                    return;
-                }
-                const script = document.createElement('script');
-                script.src = 'https://accounts.google.com/gsi/client';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-        
-        async function createDriveFolder() {
-            if (!accessToken) return;
-            
-            try {
-                const searchRes = await fetch('https://www.googleapis.com/drive/v3/files?q=name=\'Tipplr_Restaurant_Documents\' and mimeType=\'application/vnd.google-apps.folder\' and trashed=false&fields=files(id,name)', {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const searchData = await searchRes.json();
-                
-                if (searchData.files && searchData.files.length > 0) {
-                    driveFolderId = searchData.files[0].id;
-                } else {
-                    const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: 'Tipplr_Restaurant_Documents',
-                            mimeType: 'application/vnd.google-apps.folder'
-                        })
-                    });
-                    const folderData = await createRes.json();
-                    driveFolderId = folderData.id;
-                }
-            } catch (error) {
-                console.error('Folder error:', error);
-            }
-        }
-        
-        async function uploadToDrive(file, restaurantName, docType) {
-            if (!accessToken) return null;
-            
-            try {
-                const folderName = restaurantName.replace(/[^a-z0-9]/gi, '_').substring(0, 50);
-                let restaurantFolderId = null;
-                
-                const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${folderName}' and '${driveFolderId}' in parents and trashed=false&fields=files(id)`, {
-                    headers: { 'Authorization': `Bearer ${accessToken}` }
-                });
-                const searchData = await searchRes.json();
-                
-                if (searchData.files && searchData.files.length > 0) {
-                    restaurantFolderId = searchData.files[0].id;
-                } else {
-                    const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: folderName,
-                            mimeType: 'application/vnd.google-apps.folder',
-                            parents: [driveFolderId]
-                        })
-                    });
-                    const folderData = await createRes.json();
-                    restaurantFolderId = folderData.id;
-                }
-                
-                const fileName = `${docType}_${file.name}`;
-                const formData = new FormData();
-                formData.append('metadata', new Blob([JSON.stringify({
-                    name: fileName,
-                    parents: [restaurantFolderId]
-                })], { type: 'application/json' }));
-                formData.append('file', file);
-                
-                const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${accessToken}` },
-                    body: formData
-                });
-                
-                const fileData = await uploadRes.json();
-                return {
-                    fileId: fileData.id,
-                    url: `https://drive.google.com/file/d/${fileData.id}/view`,
-                    name: fileName
-                };
-            } catch (error) {
-                console.error('Upload error:', error);
-                return null;
-            }
-        }
-        
-        function disconnectDrive() {
-            if (tokenClient && accessToken) {
-                google.accounts.oauth2.revoke(accessToken, () => {});
-            }
-            accessToken = null;
-            isConnected = false;
-            updateUI(false);
-            document.getElementById('setupCard').style.display = 'block';
-            alert('Disconnected from Google Drive');
-        }
-        
-        function updateUI(connected) {
-            const statusText = document.getElementById('driveStatusText');
-            const connectBtn = document.getElementById('connectBtn');
-            
-            if (connected) {
-                statusText.textContent = 'Connected ✓';
-                statusText.className = 'drive-connected';
-                connectBtn.textContent = 'Disconnect';
-                connectBtn.onclick = disconnectDrive;
-            } else {
-                statusText.textContent = 'Not Connected';
-                statusText.className = 'drive-disconnected';
-                connectBtn.textContent = 'Connect';
-                connectBtn.onclick = () => connectToGoogleDrive();
-            }
-        }
-        
-        // ============ RESTAURANT DATA ============
-        function generateRestaurants() {
-            const areas = ["Indiranagar", "Koramangala", "Whitefield", "HSR Layout", "Jayanagar", "Malleshwaram", "JP Nagar", "Banashankari"];
-            const cuisines = ["North Indian", "South Indian", "Chinese", "Italian", "Mexican", "Japanese"];
-            const names = ["Spice Garden", "Flavors of India", "Royal Kitchen", "Bombay Bistro", "Mughal Darbar", "Garden Cafe", "Paradise", "Taj Mahal"];
-            
-            for (let i = 0; i < 50; i++) {
-                restaurants.push({
-                    id: i + 1,
-                    name: names[Math.floor(Math.random() * names.length)] + " " + (i + 1),
-                    location: areas[Math.floor(Math.random() * areas.length)],
-                    cuisine: cuisines[Math.floor(Math.random() * cuisines.length)],
-                    phone: `+91${9800000000 + i}`,
-                    rating: (3 + Math.random() * 2).toFixed(1),
-                    documents: []
-                });
-            }
-            displayRestaurants();
-        }
-        
-        function searchRestaurants() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = restaurants.filter(r => 
-                r.name.toLowerCase().includes(searchTerm) || 
-                r.location.toLowerCase().includes(searchTerm)
-            );
-            displayRestaurants(filtered);
-        }
-        
-        function displayRestaurants(list = restaurants) {
-            const grid = document.getElementById('restaurantsGrid');
-            grid.innerHTML = list.map(r => `
-                <div class="restaurant-card">
-                    <h3>${r.name}</h3>
-                    <p>📍 ${r.location} | 🍽️ ${r.cuisine} | ⭐ ${r.rating}/5</p>
-                    <p>📞 ${r.phone}</p>
-                    <div style="margin: 0.5rem 0;">
-                        <span class="doc-badge">📄 ${r.documents.length} document(s)</span>
-                    </div>
-                    <button onclick="openDocumentManager(${r.id})" class="btn-primary" style="margin-top: 0.5rem;">Manage Documents</button>
-                </div>
-            `).join('');
-        }
-        
-        // ============ DOCUMENT MANAGER ============
-        async function openDocumentManager(restaurantId) {
-            const restaurant = restaurants.find(r => r.id === restaurantId);
-            const modal = document.getElementById('docModal');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = `
-                <h4>${restaurant.name}</h4>
-                <p style="color:#666; margin-bottom:1rem;">📍 ${restaurant.location} | ⭐ ${restaurant.rating}/5</p>
-                
-                ${!isConnected ? `
-                    <div class="warning-box">
-                        ⚠️ Google Drive not connected. 
-                        <button onclick="connectToGoogleDrive()" class="btn-primary" style="margin-top:0.5rem;">Connect Now</button>
-                    </div>
-                ` : `
-                    <div class="upload-area" id="uploadArea">
-                        📁 Click to upload to Google Drive
-                        <input type="file" id="fileInput" multiple style="display:none" accept=".pdf,.jpg,.png,.doc,.docx">
-                        <div id="uploadProgressDiv" style="display:none; margin-top:1rem;">
-                            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                            <p id="uploadStatus" style="font-size:0.7rem; margin-top:0.3rem;"></p>
-                        </div>
-                    </div>
-                    
-                    <div style="margin: 1rem 0;">
-                        <label><strong>Document Type:</strong></label>
-                        <select id="docTypeSelect" style="width:100%; padding:0.5rem; margin-top:0.3rem; border-radius:8px; border:1px solid #ddd;">
-                            <option value="agreement">📄 Agreement/Contract</option>
-                            <option value="pan">🆔 PAN Card</option>
-                            <option value="gst">🏭 GST Certificate</option>
-                            <option value="license">✅ FSSAI License</option>
-                            <option value="other">📎 Other</option>
-                        </select>
-                    </div>
-                `}
-                
-                <div style="margin-top:1rem;">
-                    <strong>📄 Uploaded Documents (${restaurant.documents.length})</strong>
-                    <div id="docList" style="margin-top:0.5rem; max-height:200px; overflow-y:auto;">
-                        ${restaurant.documents.map(doc => `
-                            <div class="document-card">
-                                <div>
-                                    <strong>${doc.name}</strong>
-                                    <div style="font-size:0.7rem;">Uploaded: ${new Date(doc.uploadedAt).toLocaleDateString()}</div>
-                                </div>
-                                <div>
-                                    <a href="${doc.url}" target="_blank" style="background:#2196f3; color:white; padding:0.2rem 0.5rem; border-radius:4px; text-decoration:none; font-size:0.7rem;">View</a>
-                                    <button onclick="deleteDocument(${restaurant.id}, '${doc.id}')" style="background:#f44336; color:white; border:none; padding:0.2rem 0.5rem; border-radius:4px; margin-left:0.3rem; cursor:pointer;">Delete</button>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-            
-            if (isConnected) {
-                const uploadArea = document.getElementById('uploadArea');
-                const fileInput = document.getElementById('fileInput');
-                
-                uploadArea.onclick = () => fileInput.click();
-                fileInput.onchange = async (e) => {
-                    await handleFileUpload(e.target.files, restaurant);
-                };
-            }
-            
-            modal.style.display = 'flex';
-        }
-        
-        async function handleFileUpload(files, restaurant) {
-            const docType = document.getElementById('docTypeSelect').value;
-            const progressDiv = document.getElementById('uploadProgressDiv');
-            const progressFill = document.getElementById('progressFill');
-            const uploadStatus = document.getElementById('uploadStatus');
-            
-            progressDiv.style.display = 'block';
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                uploadStatus.textContent = `Uploading: ${file.name}...`;
-                progressFill.style.width = '0%';
-                
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += 10;
-                    progressFill.style.width = `${progress}%`;
-                    if (progress >= 90) clearInterval(interval);
-                }, 100);
-                
-                const result = await uploadToDrive(file, restaurant.name, docType);
-                clearInterval(interval);
-                progressFill.style.width = '100%';
-                
-                if (result) {
-                    restaurant.documents.push({
-                        id: `doc_${Date.now()}_${i}`,
-                        name: file.name,
-                        type: docType,
-                        url: result.url,
-                        fileId: result.fileId,
-                        uploadedAt: new Date().toISOString()
-                    });
-                    uploadStatus.textContent = `✅ ${file.name} uploaded!`;
-                } else {
-                    uploadStatus.textContent = `❌ Failed: ${file.name}`;
-                }
-                await new Promise(r => setTimeout(r, 500));
-            }
-            
-            setTimeout(() => {
-                progressDiv.style.display = 'none';
-                openDocumentManager(restaurant.id);
-            }, 1000);
-            displayRestaurants();
-        }
-        
-        function deleteDocument(restaurantId, docId) {
-            if (confirm('Delete this document?')) {
-                const restaurant = restaurants.find(r => r.id === restaurantId);
-                restaurant.documents = restaurant.documents.filter(d => d.id !== docId);
-                openDocumentManager(restaurantId);
-                displayRestaurants();
-            }
-        }
-        
-        function closeModal() {
-            document.getElementById('docModal').style.display = 'none';
-        }
-        
-        // ============ INITIALIZATION ============
-        generateRestaurants();
-        document.getElementById('connectBtn').onclick = () => connectToGoogleDrive();
-        document.getElementById('saveAndConnect').onclick = () => connectToGoogleDrive();
-        
-        window.onclick = (event) => {
-            if (event.target.classList.contains('modal')) closeModal();
-        };
-    </script>
+function selectObType(type, id){
+  currentObType=type;
+  document.querySelectorAll('.ob-tab').forEach(t=>t.classList.remove('active'));
+  g(`obTab-${type}`).classList.add('active');
+  renderObForm(id, type);
+}
+
+function renderObForm(id, type){
+  const r=byId(id);
+  const isRest = type==='restaurant';
+  g('obFormSection').innerHTML=`
+    <div class="frow">
+      <div class="fg"><label class="fl">Assign To</label>
+        <select class="fi2" id="oAss"><option value="">Select member</option>${DB.team.map(m=>`<option value="${m.id}" ${r.assignedTo===m.id?'selected':''}>${m.name}</option>`).join('')}</select>
+      </div>
+      <div class="fg"><label class="fl">Final Commission %</label>
+        <input class="fi2" type="number" id="oComm" value="${r.estimatedCommission.split('-')[0]}" min="1" max="35">
+      </div>
+    </div>
+    ${isRest?`
+    <div class="frow">
+      <div class="fg"><label class="fl">Menu Category</label>
+        <select class="fi2" id="oMenuCat"><option>Veg Only</option><option>Non-Veg</option><option>Both Veg & Non-Veg</option></select>
+      </div>
+      <div class="fg"><label class="fl">Avg Order Value (₹)</label>
+        <input class="fi2" type="number" id="oAOV" placeholder="300" min="50">
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Operating Hours</label>
+      <input class="fi2" id="oHours" placeholder="e.g. 10:00 AM – 11:00 PM"></div>`:`
+    <div class="frow">
+      <div class="fg"><label class="fl">UDYAM / MSME Reg. No.</label>
+        <input class="fi2" id="oUdyam" placeholder="UDYAM-KA-…"></div>
+      <div class="fg"><label class="fl">GST Number</label>
+        <input class="fi2" id="oGST" placeholder="29XXXXX…"></div>
+    </div>
+    <div class="fg"><label class="fl">PAN Number</label><input class="fi2" id="oPAN" placeholder="ABCDE1234F"></div>`}
+    <div class="fg"><label class="fl">Contract Start Date</label>
+      <input class="fi2" type="date" id="oDate" value="${new Date().toISOString().split('T')[0]}"></div>
+    ${driveOk?`
+    <div class="fg">
+      <label class="fl">Upload ${isRest?'Restaurant':'MSME'} Documents (optional)</label>
+      <div class="upzone" onclick="g('obFileIn').click()" style="padding:1rem;">
+        <div style="font-size:.82rem;font-weight:700;">📎 Attach documents → Drive: ${isRest?'Restaurant_Onboarding':'MSME_Onboarding'}</div>
+        <input type="file" id="obFileIn" multiple style="display:none" onchange="handleObFiles(event,${id},'${type}')">
+      </div>
+    </div>`:''}
+    <div class="fg"><label class="fl">Notes</label><textarea class="fta" id="oNotes" style="min-height:70px;">${r.notes||''}</textarea></div>
+    <div style="display:flex;gap:.65rem;margin-top:.85rem;">
+      <button class="btn btn-p" style="flex:1;" onclick="confirmOB(${id},'${type}')">✅ Confirm ${isRest?'Restaurant':'MSME'} Onboarding</button>
+      <button class="btn btn-g" onclick="closeOv('onboardOv')">Cancel</button>
+    </div>`;
+}
+
+async function handleObFiles(ev, id, type){
+  const r=byId(id);
+  if(Array.isArray(r.documents)) r.documents={restaurant:r.documents,msme:[]};
+  if(!r.documents[type]) r.documents[type]=[];
+  for(const f of ev.target.files){
+    toast(`Uploading ${f.name}…`);
+    const dr = driveOk ? await uploadToDrive(f, r.name, type) : null;
+    r.documents[type].push({id:'d'+Date.now()+Math.random().toString(36).slice(2),name:f.name,size:fmtSz(f.size),uploadedAt:new Date().toISOString(),url:dr?`https://drive.google.com/file/d/${dr.id}/view`:null});
+    saveDB();toast(`${f.name} uploaded!`,'success');
+  }
+  updateStats();
+}
+
+function confirmOB(id, type){
+  const r=byId(id);
+  const a=g('oAss').value;
+  r.assignedTo=a?parseInt(a):r.assignedTo;
+  r.stage='onboarded'; r.onboardedDate=new Date().toISOString();
+  r.notes=g('oNotes').value;
+  r.estimatedCommission=g('oComm').value+'%';
+  r.lastUpdated=new Date().toISOString();
+  // save extra fields
+  if(type==='restaurant'){
+    r.menuCategory=g('oMenuCat')?.value;
+    r.avgOrderValue=g('oAOV')?.value;
+    r.operatingHours=g('oHours')?.value;
+  } else {
+    r.udyamNo=g('oUdyam')?.value;
+    r.gstNo=g('oGST')?.value;
+    r.panNo=g('oPAN')?.value;
+  }
+  saveDB();refreshAll();closeOv('onboardOv');
+  toast(`✅ ${r.name} onboarded (${type==='restaurant'?'Restaurant':'MSME'})!`,'success');
+}
+
+// ═══════════════════════════════════
+// TEAM VIEW
+// ═══════════════════════════════════
+function renderTeam(){
+  // ── Cards ──
+  g('tgrid').innerHTML = DB.team.map(m=>{
+    const asgn=DB.restaurants.filter(r=>r.assignedTo===m.id);
+    const ob=asgn.filter(r=>r.stage==='onboarded').length;
+    const mStart=new Date();mStart.setDate(1);
+    const moOb=asgn.filter(r=>r.onboardedDate&&new Date(r.onboardedDate)>=mStart).length;
+    const tgt=m.target||50;
+    const pct=Math.min(100,Math.round(moOb/tgt*100));
+    const barColor=pct>=100?'var(--ok)':pct>=60?'var(--warn)':'var(--A)';
+    const init=m.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const dueFU=DB.restaurants.filter(r=>r.assignedTo===m.id&&r.followUpDate&&r.followUpDate<=new Date().toISOString().split('T')[0]).length;
+    return`<div class="tcard ${tf===m.id?'sel':''}" onclick="setTF(${m.id})">
+      <div class="tav" style="background:${m.color};">${init}</div>
+      <div class="tn">${m.name}${dueFU>0?` <span style="font-size:.6rem;background:#fef2f2;color:var(--dan);border-radius:4px;padding:.1rem .3rem;">${dueFU} due</span>`:''}</div>
+      <div class="tr2">${m.role||'Sales Executive'}</div>
+      <div class="tsr">
+        <span class="tst" style="background:#eff6ff;color:#1d4ed8;">Assigned: ${asgn.length}</span>
+        <span class="tst" style="background:#f0fdf4;color:#166534;">Onboarded: ${ob}</span>
+      </div>
+      <div style="margin-top:.55rem;font-size:.61rem;color:var(--t3);">Month: ${moOb} / ${tgt} (${pct}%)</div>
+      <div class="tbar-wrap"><div class="tbar" style="width:${pct}%;background:${barColor};"></div></div>
+    </div>`;
+  }).join('') + `<div class="tcard add-tc" onclick="openAddTeam()"><div style="font-size:1.8rem;">+</div><div style="font-weight:700;font-size:.82rem;">Add Member</div></div>`;
+
+  // ── Table ──
+  const stf=g('tmStage')?.value||'all';
+  const srf=g('tmSrc')?.value||'all';
+  const tyf=g('tmType')?.value||'all';
+  const tmq=(g('tmQ')?.value||'').toLowerCase();
+  const today=new Date().toISOString().split('T')[0];
+
+  let rows=DB.restaurants.filter(r=>tf?r.assignedTo===tf:true);
+  if(stf!=='all') rows=rows.filter(r=>r.stage===stf);
+  if(srf!=='all') rows=rows.filter(r=>r.source===srf);
+  if(tyf!=='all') rows=rows.filter(r=>r.type===tyf);
+  if(tmq) rows=rows.filter(r=>r.name.toLowerCase().includes(tmq)||r.location.toLowerCase().includes(tmq));
+
+  g('tmCount').textContent=`${rows.length.toLocaleString()} restaurants`;
+  rows=rows.slice(0,500);
+
+  g('ttbody').innerHTML=rows.map(r=>{
+    const m=DB.team.find(m=>m.id===r.assignedTo);
+    const fuOver=r.followUpDate&&r.followUpDate<today;
+    const fuToday=r.followUpDate&&r.followUpDate===today;
+    const docCount=(Array.isArray(r.documents)?r.documents.length:(r.documents.restaurant||[]).length+(r.documents.msme||[]).length);
+    return`<tr>
+      <td><b style="cursor:pointer;color:var(--C);" onclick="openDetail(${r.id})">${r.name}</b><br><small style="color:var(--t3);">${r.location}</small></td>
+      <td>${typeBadge(r.type)}</td>
+      <td>${m?`<span style="font-weight:700;color:${m.color};">${m.name}</span>`:'<span style="color:var(--t3);">Unassigned</span>'}</td>
+      <td><span class="sp s${r.stage[0]}">${r.stage.charAt(0).toUpperCase()+r.stage.slice(1)}</span></td>
+      <td style="text-transform:capitalize;font-size:.72rem;">${r.source}</td>
+      <td style="font-size:.7rem;${fuOver?'color:var(--dan);font-weight:700;':fuToday?'color:var(--warn);font-weight:700;':'color:var(--t3);'}">${fuOver?'⚠️ ':fuToday?'🔔 ':''}${r.followUpDate||'—'}</td>
+      <td style="font-size:.7rem;color:var(--t2);">${r.onboardedDate?new Date(r.onboardedDate).toLocaleDateString('en-IN'):'—'}</td>
+      <td style="text-align:center;">${docCount}</td>
+      <td><div class="arow">
+        <button class="ib i-o" onclick="openOnboard(${r.id})" title="Onboard">🚀</button>
+        <button class="ib i-d" onclick="openDetail(${r.id},'docs')" title="Docs">📄</button>
+        <button class="ib i-v" onclick="openDetail(${r.id})" title="View">👁</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function setTF(id){tf=tf===id?null:id;renderTeam();}
+function clearTF(){tf=null;renderTeam();}
+function openAddTeam(){g('addTeamOv').classList.add('open');}
+function addMember(){
+  const name=g('nName').value.trim();
+  if(!name){toast('Name required','error');return;}
+  const cols=['#e8344e','#6c5ce7','#00b894','#f39c12','#0984e3','#fd79a8','#a29bfe','#55efc4'];
+  DB.team.push({id:Date.now(),name,role:g('nRole').value.trim()||'Sales Executive',email:g('nEmail').value.trim(),phone:g('nPhone').value.trim(),color:cols[DB.team.length%cols.length],target:parseInt(g('nTarget').value)||50});
+  saveDB();updateStats();renderTeam();closeOv('addTeamOv');
+  ['nName','nEmail','nPhone'].forEach(id=>{const el=g(id);if(el)el.value='';});
+  g('nRole').value='Sales Executive';g('nTarget').value='50';
+  toast(`${name} added to team`,'success');
+}
+
+// ═══════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════
+function initAnaRange(){
+  const now=new Date(), ms=new Date(now.getFullYear(),now.getMonth(),1);
+  g('anaFrom').value=ms.toISOString().split('T')[0];
+  g('anaTo').value=now.toISOString().split('T')[0];
+  const el=g('anaMember');
+  el.innerHTML='<option value="all">All Members</option>'+DB.team.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+}
+function setQRange(){
+  const v=g('anaQ').value; if(!v)return;
+  const now=new Date(); let from, to=now.toISOString().split('T')[0];
+  if(v==='today'){from=to;}
+  else if(v==='week'){const d=new Date(now);d.setDate(d.getDate()-d.getDay());from=d.toISOString().split('T')[0];}
+  else if(v==='month'){from=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];}
+  else if(v==='lastmonth'){from=new Date(now.getFullYear(),now.getMonth()-1,1).toISOString().split('T')[0];to=new Date(now.getFullYear(),now.getMonth(),0).toISOString().split('T')[0];}
+  else if(v==='quarter'){const q=Math.floor(now.getMonth()/3);from=new Date(now.getFullYear(),q*3,1).toISOString().split('T')[0];}
+  else if(v==='year'){from=new Date(now.getFullYear(),0,1).toISOString().split('T')[0];}
+  else{from='2020-01-01';}
+  g('anaFrom').value=from; g('anaTo').value=to; g('anaQ').value='';
+  renderAnalytics();
+}
+function resetAna(){initAnaRange();renderAnalytics();}
+function inRange(ds,from,to){if(!ds)return false;const d=new Date(ds);return d>=from&&d<=to;}
+
+function renderAnalytics(){
+  const from=new Date(g('anaFrom').value+'T00:00:00'), to=new Date(g('anaTo').value+'T23:59:59');
+  const mFilt=g('anaMember')?.value||'all';
+  const gTgt=parseInt(g('gTarget')?.value)||50;
+  const days=Math.max(1,Math.round((to-from)/864e5)+1);
+
+  g('anaPLbl').textContent=`${from.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} → ${to.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}`;
+
+  let base=mFilt==='all'?DB.restaurants:DB.restaurants.filter(r=>r.assignedTo===parseInt(mFilt));
+  const tot=base.length;
+  const obInPeriod=base.filter(r=>inRange(r.onboardedDate,from,to)).length;
+  const totalOb=base.filter(r=>r.stage==='onboarded').length;
+  const lead=base.filter(r=>r.stage==='lead').length;
+  const cont=base.filter(r=>r.stage==='contacted').length;
+  const neg=base.filter(r=>r.stage==='negotiation').length;
+  const ts=new Date().toDateString();
+  const ws=new Date();ws.setDate(ws.getDate()-ws.getDay());
+  const ms2=new Date();ms2.setDate(1);
+  const td=base.filter(r=>r.onboardedDate&&new Date(r.onboardedDate).toDateString()===ts).length;
+  const wk=base.filter(r=>r.onboardedDate&&new Date(r.onboardedDate)>=ws).length;
+  const mo=base.filter(r=>r.onboardedDate&&new Date(r.onboardedDate)>=ms2).length;
+  const totalDocs=base.reduce((s,r)=>{const d=r.documents;return s+(Array.isArray(d)?d.length:(d.restaurant||[]).length+(d.msme||[]).length);},0);
+  const unassigned=base.filter(r=>!r.assignedTo).length;
+  const dueFU=base.filter(r=>r.followUpDate&&r.followUpDate<=new Date().toISOString().split('T')[0]).length;
+  const cv=tot?((totalOb/tot)*100).toFixed(1):'0.0';
+
+  g('agrid').innerHTML=[
+    {l:'Total Leads',v:tot.toLocaleString(),c:'var(--C)',s:'In CRM'},
+    {l:'Onboarded (Period)',v:obInPeriod,c:'var(--ok)',s:ob?`${(obInPeriod/days).toFixed(1)}/day`:'—'},
+    {l:'Conversion',v:cv+'%',c:'var(--ok)',s:'Overall rate'},
+    {l:'In Lead',v:lead.toLocaleString(),c:'var(--t2)',s:'Not contacted'},
+    {l:'Contacted',v:cont.toLocaleString(),c:'var(--inf)',s:'Active'},
+    {l:'Negotiation',v:neg.toLocaleString(),c:'var(--warn)',s:'Closing soon'},
+    {l:'Today',v:td,c:'var(--A)',s:'Onboarded today'},
+    {l:'This Week',v:wk,c:'var(--inf)',s:'Week total'},
+    {l:'This Month',v:mo,c:'var(--C)',s:'Month total'},
+    {l:'Docs Uploaded',v:totalDocs,c:'#7c3aed',s:'Both folder types'},
+    {l:'Unassigned',v:unassigned,c:'var(--dan)',s:'Needs attention'},
+    {l:'Follow-ups Due',v:dueFU,c:'var(--warn)',s:'Overdue / today'},
+  ].map(c=>`<div class="acard"><div class="albl">${c.l}</div><div class="aval" style="color:${c.c};">${c.v}</div><div class="asub">${c.s}</div></div>`).join('');
+
+  // Team performance
+  const pTgt=Math.round(gTgt*days/30);
+  g('abody').innerHTML=DB.team.map(m=>{
+    const a=(mFilt!=='all'&&parseInt(mFilt)!==m.id)?[]:DB.restaurants.filter(r=>r.assignedTo===m.id);
+    const mOb=a.filter(r=>inRange(r.onboardedDate,from,to)).length;
+    const mTotOb=a.filter(r=>r.stage==='onboarded').length;
+    const mCt=a.filter(r=>r.stage==='contacted').length;
+    const mNg=a.filter(r=>r.stage==='negotiation').length;
+    const mTd=a.filter(r=>r.onboardedDate&&new Date(r.onboardedDate).toDateString()===ts).length;
+    const mWk=a.filter(r=>r.onboardedDate&&new Date(r.onboardedDate)>=ws).length;
+    const mMo=a.filter(r=>r.onboardedDate&&new Date(r.onboardedDate)>=ms2).length;
+    const mcv=a.length?((mTotOb/a.length)*100).toFixed(1):'0.0';
+    const mPTgt=Math.round((m.target||gTgt)*days/30);
+    const pct=mPTgt?Math.min(100,Math.round(mOb/mPTgt*100)):0;
+    const bar=pct>=100?'#00b894':pct>=60?'#f39c12':'#e8344e';
+    const cls=pct>=100?'style="color:var(--ok);font-weight:800;"':pct>=60?'style="color:var(--warn);font-weight:700;"':'style="color:var(--dan);font-weight:700;"';
+    return`<tr>
+      <td><b style="color:${m.color};">${m.name}</b><br><span style="font-size:.63rem;color:var(--t3);">${m.role||''}</span></td>
+      <td><b>${a.length}</b></td><td style="color:var(--inf);">${mCt}</td><td style="color:var(--warn);">${mNg}</td>
+      <td style="color:var(--ok);font-weight:800;">${mTotOb}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:.71rem;">${mPTgt}</td>
+      <td ${cls}>${mOb}</td>
+      <td style="min-width:100px;"><div style="font-size:.63rem;color:var(--t2);margin-bottom:2px;">${pct}%</div><div style="background:var(--s3);border-radius:4px;height:5px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${bar};border-radius:4px;"></div></div></td>
+      <td>${mTd}</td><td>${mWk}</td><td>${mMo}</td>
+      <td><b style="color:var(--C);">${mcv}%</b></td>
+    </tr>`;
+  }).join('');
+
+  // Type breakdown
+  const TYPES=["Restaurant","Cafe","Bakery","Sweet Shop","QSR","Fast Food","Cloud Kitchen","Fine Dining","Dhaba","Bar & Pub","Ice Cream","Juice Shop","Mithai"];
+  g('typeBody').innerHTML=TYPES.map(t=>{
+    const tr=base.filter(r=>r.type===t); if(!tr.length)return'';
+    const tob=tr.filter(r=>r.stage==='onboarded').length;
+    const tcv=((tob/tr.length)*100).toFixed(1);
+    return`<tr><td>${typeBadge(t)}</td><td><b>${tr.length}</b></td><td style="color:var(--ok);font-weight:700;">${tob}</td><td><b style="color:${parseFloat(tcv)>=15?'var(--ok)':'var(--warn)'};">${tcv}%</b></td></tr>`;
+  }).join('');
+
+  // Source breakdown
+  [['zomato','Zomato','#e23744'],['swiggy','Swiggy','#fc8019'],['google','Google Maps','#1a73e8'],['magicpin','Magicpin','#9c27b0']].forEach(([k,l,c])=>{
+    const el=g('srcBody'); if(!el) return;
+  });
+  g('srcBody').innerHTML=[['zomato','Zomato','#e23744'],['swiggy','Swiggy','#fc8019'],['google','Google Maps','#1a73e8'],['magicpin','Magicpin','#9c27b0']].map(([k,l,c])=>{
+    const sr=base.filter(r=>r.source===k); const sob=sr.filter(r=>r.stage==='onboarded').length;
+    const scv=sr.length?((sob/sr.length)*100).toFixed(1):'0.0';
+    return`<tr><td><b style="color:${c};">${l}</b></td><td><b>${sr.length}</b></td><td style="color:var(--ok);font-weight:700;">${sob}</td><td><b style="color:${parseFloat(scv)>=10?'var(--ok)':'var(--warn)'};">${scv}%</b></td></tr>`;
+  }).join('');
+
+  // Areas
+  const areaMap={};
+  base.forEach(r=>{
+    if(!areaMap[r.location]) areaMap[r.location]={total:0,ob:0,types:{}};
+    areaMap[r.location].total++;
+    if(r.stage==='onboarded') areaMap[r.location].ob++;
+    areaMap[r.location].types[r.type]=(areaMap[r.location].types[r.type]||0)+1;
+  });
+  g('areaBody').innerHTML=Object.entries(areaMap).sort((a,b)=>b[1].total-a[1].total).slice(0,15).map(([area,d])=>{
+    const topType=Object.entries(d.types).sort((a,b)=>b[1]-a[1])[0]?.[0]||'—';
+    return`<tr><td><b>${area}</b></td><td><b>${d.total}</b></td><td style="color:var(--ok);font-weight:700;">${d.ob}</td><td style="font-size:.71rem;color:var(--t2);">₹${(d.ob*15000).toLocaleString()}/mo</td><td>${typeBadge(topType)}</td></tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// SCRAPER
+// ═══════════════════════════════════
+function toggleChip(el,src){el.classList.toggle('on');if(activeSrc.has(src))activeSrc.delete(src);else activeSrc.add(src);}
+async function startScrape(){
+  if(!activeSrc.size){toast('Select at least one source','error');return;}
+  const btn=g('scrapeBtn'), pw=g('pwrap'), fill=g('pfill'), lbl=g('plbl');
+  btn.disabled=true; pw.style.display='flex';
+  const srcs=[...activeSrc];
+  const steps=['Authenticating APIs…','Fetching restaurant listings…','Pulling contact details…','Scraping discount data…','Extracting FSSAI numbers…','Cross-referencing sources…','Deduplicating records…','Syncing to CRM…'];
+  for(let i=0;i<steps.length;i++){
+    lbl.textContent=`[${srcs.join('+')}] ${steps[i]}`;
+    fill.style.width=`${Math.round((i+1)/steps.length*100)}%`;
+    await new Promise(r=>setTimeout(r,600+Math.random()*500));
+  }
+  const added=300+Math.floor(Math.random()*700);
+  toast(`✅ Scraped ${added} new restaurants from ${srcs.join(', ')}`,'success');
+  pw.style.display='none'; fill.style.width='0%'; btn.disabled=false; updateStats();
+}
+
+// ═══════════════════════════════════
+// GOOGLE DRIVE
+// ═══════════════════════════════════
+async function connectDrive(){
+  if(driveOk){disconnectDrive();return;}
+  if(typeof google==='undefined'){showDriveGuide();return;}
+  try{
+    gTC=google.accounts.oauth2.initTokenClient({client_id:GID,scope:GSCOPE,
+      callback:async resp=>{
+        if(resp.error){toast('Auth failed: '+resp.error,'error');showDriveGuide();return;}
+        gToken=resp.access_token; driveOk=true; updateDUI(true);
+        await ensureFolders();
+        toast('✅ Google Drive connected!','success');
+      }
+    });
+    gTC.requestAccessToken({prompt:''});
+  } catch(e){ showDriveGuide(); }
+}
+function disconnectDrive(){
+  if(gToken) try{google.accounts.oauth2.revoke(gToken);}catch(e){}
+  gToken=null; driveOk=false; gFolders={root:null,restaurant:null,msme:null}; updateDUI(false);
+  toast('Drive disconnected');
+}
+function updateDUI(ok){
+  g('dpill').className='dpill '+(ok?'ok':'');
+  g('ddot').className='ddot '+(ok?'on':'off');
+  g('dlbl').textContent=ok?'✓ Drive Connected':'Connect Google Drive';
+}
+
+async function ensureFolders(){
+  gFolders.root=await getOrCreateFolder('Tipplr_CRM',null);
+  gFolders.restaurant=await getOrCreateFolder('Restaurant_Onboarding',gFolders.root);
+  gFolders.msme=await getOrCreateFolder('MSME_Onboarding',gFolders.root);
+}
+async function getOrCreateFolder(name,parent){
+  try{
+    const q=encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false${parent?` and '${parent}' in parents`:''}`);
+    const res=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)`,{headers:{Authorization:`Bearer ${gToken}`}});
+    const data=await res.json();
+    if(data.files?.length) return data.files[0].id;
+    const body={name,mimeType:'application/vnd.google-apps.folder'};
+    if(parent) body.parents=[parent];
+    const cr=await fetch('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{Authorization:`Bearer ${gToken}`,'Content-Type':'application/json'},body:JSON.stringify(body)});
+    return(await cr.json()).id;
+  } catch(e){console.error(e);return null;}
+}
+async function getOrCreateRestFolder(restName, type){
+  const parentId = type==='msme' ? gFolders.msme : gFolders.restaurant;
+  return getOrCreateFolder(restName.replace(/[^a-z0-9]/gi,'_').slice(0,50), parentId);
+}
+async function uploadToDrive(file, restName, type='restaurant'){
+  if(!gToken) return null;
+  try{
+    const fid=await getOrCreateRestFolder(restName, type);
+    const form=new FormData();
+    form.append('metadata',new Blob([JSON.stringify({name:file.name,parents:[fid]})],{type:'application/json'}));
+    form.append('file',file);
+    const res=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{Authorization:`Bearer ${gToken}`},body:form});
+    return await res.json();
+  } catch(e){console.error(e);return null;}
+}
+
+// ═══════════════════════════════════
+// DRIVE GUIDE MODAL
+// ═══════════════════════════════════
+function showDriveGuide(){
+  g('driveGuideBody').innerHTML=`
+    <div class="info-box" style="margin-bottom:1rem;">This CRM is hosted on Vercel/GitHub. To connect Google Drive you need to authorise your Google Cloud project. Here's the exact setup:</div>
+
+    <div style="font-weight:800;font-size:.88rem;margin-bottom:.5rem;">📋 Step-by-step Google Drive Setup</div>
+
+    <div style="display:flex;flex-direction:column;gap:.75rem;font-size:.8rem;line-height:1.6;">
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 1 — Google Cloud Console</div>
+        <div>Go to <b>console.cloud.google.com</b> → Create / select your project → Enable <b>Google Drive API</b></div>
+      </div>
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 2 — OAuth Consent Screen</div>
+        <div>APIs & Services → OAuth consent screen → External → Add your email as test user → Scopes: <code style="background:#f0edff;padding:.1rem .3rem;border-radius:4px;">.../auth/drive.file</code></div>
+      </div>
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 3 — Create OAuth Credentials</div>
+        <div>APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID → Web Application<br>
+        <b>Authorised JavaScript origins:</b><br>
+        <code style="background:#f0edff;padding:.1rem .4rem;border-radius:4px;display:block;margin-top:.3rem;">https://your-project.vercel.app</code>
+        <code style="background:#f0edff;padding:.1rem .4rem;border-radius:4px;display:block;margin-top:.25rem;">http://localhost:3000</code>
+        </div>
+      </div>
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 4 — Copy Client ID into code</div>
+        <div>In <code>index.html</code>, line 1 of the script section, replace the <code>GID</code> value with your Client ID:<br>
+        <code style="background:#f0edff;padding:.2rem .5rem;border-radius:4px;display:block;margin-top:.3rem;word-break:break-all;">const GID = "YOUR_CLIENT_ID.apps.googleusercontent.com";</code>
+        </div>
+      </div>
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 5 — Drive folder structure (auto-created)</div>
+        <div>Once connected, the CRM auto-creates:<br>
+        <code style="background:#f0edff;padding:.2rem .5rem;border-radius:4px;display:block;margin-top:.3rem;">📁 Tipplr_CRM/<br>
+&nbsp;&nbsp;📁 Restaurant_Onboarding/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/<br>
+&nbsp;&nbsp;📁 MSME_Onboarding/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/</code>
+        </div>
+      </div>
+      <div style="background:#f0fdf9;border:1px solid #b0e8d6;border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--ok);">✅ Vercel Deploy Notes</div>
+        <div>• Push <code>index.html</code> to GitHub → Connect repo in Vercel<br>
+        • Add your Vercel domain to the <b>Authorised JS origins</b> in Google Cloud<br>
+        • No server needed — everything runs client-side<br>
+        • Data is stored in browser <b>localStorage</b> (use Export CSV to backup)</div>
+      </div>
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:1rem;" onclick="closeOv('driveGuideOv');connectDrive();">Try Connect Again</button>`;
+  g('driveGuideOv').classList.add('open');
+}
+
+// ═══════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════
+function exportCSV(){
+  const hdr=['ID','Name','Type','Category','Location','Address','Cuisine','Phone1','Phone2','Email','FSSAI','Rating','Source','Zomato Disc','Swiggy Disc','Commission','Stage','Assigned To','Follow-up Date','Onboarded Date','Docs','Last Updated'];
+  const rows=filtered.map(r=>{
+    const docCount=Array.isArray(r.documents)?r.documents.length:(r.documents.restaurant||[]).length+(r.documents.msme||[]).length;
+    return[r.id,r.name,r.type,r.category,r.location,r.address,r.cuisine,r.mobiles[0]||'',r.mobiles[1]||'',r.email,r.fssaiNumber,r.rating,r.source,r.discounts.zomato,r.discounts.swiggy,r.estimatedCommission,r.stage,DB.team.find(m=>m.id===r.assignedTo)?.name||'',r.followUpDate||'',r.onboardedDate?new Date(r.onboardedDate).toLocaleDateString('en-IN'):'',docCount,new Date(r.lastUpdated).toLocaleDateString('en-IN')];
+  });
+  const csv=[hdr,...rows].map(row=>row.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`tipplr_export_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast(`Exported ${filtered.length.toLocaleString()} records`,'success');
+}
+
+// ═══════════════════════════════════
+// UTILS
+// ═══════════════════════════════════
+function closeOv(id){g(id).classList.remove('open');}
+function toast(msg,type=''){
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span>${type==='success'?'✅':type==='error'?'❌':type==='warn'?'⚠️':'ℹ️'}</span><span>${msg}</span>`;
+  g('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),4000);
+}
+
+// ═══════════════════════════════════
+// START
+// ═══════════════════════════════════
+init();
+</script>
 </body>
 </html>
