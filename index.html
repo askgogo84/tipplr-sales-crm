@@ -498,8 +498,8 @@ tbody tr:hover{background:var(--s2);}
 // ═══════════════════════════════════
 // CONFIG  — paste your Client ID here
 // ═══════════════════════════════════
-const GID   = "20488488150-muc31l0c2al83ma9nf0g4jm35lb3fcbc.apps.googleusercontent.com";
-const GSCOPE= "https://www.googleapis.com/auth/drive.file";
+const GID   = "20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com";
+const GSCOPE= "https://www.googleapis.com/auth/drive.file openid email";
 const PER   = 50;
 
 // ═══════════════════════════════════
@@ -508,7 +508,7 @@ const PER   = 50;
 let DB={restaurants:[],team:[]};
 let filtered=[], pg=1, tf=null, dId=null, dTab='info';
 let activeSrc=new Set(['zomato','swiggy','google','magicpin']);
-let gToken=null, driveOk=false, gTC=null;
+let gToken=null, driveOk=false, gTokenExpiry=0, gRefreshTimer=null;
 let gFolders={root:null, restaurant:null, msme:null};
 let currentObType='restaurant'; // 'restaurant' | 'msme'
 
@@ -521,6 +521,14 @@ function init(){
   refreshAll();
   populateAreaFilter();
   checkReminders();
+  // Warn immediately if opened as a local file (Drive will never work)
+  if(window.location.protocol === 'file:'){
+    setTimeout(()=>{
+      toast('⚠️ Opened as local file — Drive won\'t work. See Connect Drive guide.','warn');
+    }, 1200);
+  }
+  // Auto-restore Drive session after Google APIs load
+  waitForGoogleThenRestore();
 }
 
 // ── NAV (plain function, no event listener dependency) ──
@@ -1347,33 +1355,195 @@ async function startScrape(){
   pw.style.display='none'; fill.style.width='0%'; btn.disabled=false; updateStats();
 }
 
-// ═══════════════════════════════════
-// GOOGLE DRIVE
-// ═══════════════════════════════════
-async function connectDrive(){
-  if(driveOk){disconnectDrive();return;}
-  if(typeof google==='undefined'){showDriveGuide();return;}
+// ══════════════════════════════════════════════════════════════
+// GOOGLE DRIVE  — truly persistent across page refreshes
+//
+// HOW IT WORKS:
+//  • On first connect: token + expiry + email + folders saved to localStorage
+//  • On every page load: if token still valid → restore instantly, no popup
+//  • If token expired: silently request new one using stored email as hint
+//    (no account picker, no consent screen — browser handles it invisibly
+//    because the user already granted consent for this origin)
+//  • Token auto-refreshes every 50 min while tab is open
+// ══════════════════════════════════════════════════════════════
+
+const DS_TOKEN   = 'tc6_drive_token';
+const DS_EXPIRY  = 'tc6_drive_expiry';
+const DS_EMAIL   = 'tc6_drive_email';
+const DS_FOLDERS = 'tc6_drive_folders';
+
+// ── Save everything to localStorage ──
+function saveDriveSession(token, expiresIn, email){
   try{
-    gTC=google.accounts.oauth2.initTokenClient({client_id:GID,scope:GSCOPE,
-      callback:async resp=>{
-        if(resp.error){toast('Auth failed: '+resp.error,'error');showDriveGuide();return;}
-        gToken=resp.access_token; driveOk=true; updateDUI(true);
-        await ensureFolders();
-        toast('✅ Google Drive connected!','success');
+    // Store with 2-min safety margin
+    localStorage.setItem(DS_TOKEN,   token);
+    localStorage.setItem(DS_EXPIRY,  String(Date.now() + (expiresIn - 120) * 1000));
+    if(email) localStorage.setItem(DS_EMAIL, email);
+    localStorage.setItem(DS_FOLDERS, JSON.stringify(gFolders));
+  } catch(e){ console.warn('Drive session save failed', e); }
+}
+
+// ── Load token from localStorage, return true if still valid ──
+function loadDriveSession(){
+  try{
+    const token   = localStorage.getItem(DS_TOKEN);
+    const expiry  = parseInt(localStorage.getItem(DS_EXPIRY) || '0');
+    const folders = localStorage.getItem(DS_FOLDERS);
+    if(token && expiry > Date.now()){
+      gToken       = token;
+      gTokenExpiry = expiry;
+      if(folders) gFolders = JSON.parse(folders);
+      return true;
+    }
+  } catch(e){}
+  return false;
+}
+
+function getSavedEmail(){ return localStorage.getItem(DS_EMAIL) || ''; }
+
+function clearDriveSession(){
+  [DS_TOKEN, DS_EXPIRY, DS_EMAIL, DS_FOLDERS].forEach(k => localStorage.removeItem(k));
+}
+
+// ── Called once on page load — waits for Google script then restores ──
+function waitForGoogleThenRestore(){
+  if(window.location.protocol === 'file:') return; // never works on file://
+
+  function attempt(){
+    // Case 1: token is still valid → use it immediately, zero popup
+    if(loadDriveSession()){
+      driveOk = true;
+      updateDUI(true);
+      scheduleTokenRefresh(Math.round((gTokenExpiry - Date.now()) / 1000));
+      return;
+    }
+    // Case 2: token expired but user previously connected → silent re-auth
+    // requestAccessToken with prompt:'' + login_hint skips the account picker
+    // entirely when the browser already has a valid Google session for that account
+    const email = getSavedEmail();
+    if(!email) return; // never connected before — wait for manual click
+
+    try{
+      const tc = google.accounts.oauth2.initTokenClient({
+        client_id  : GID,
+        scope      : GSCOPE,
+        prompt     : '',          // ← NO popup if consent already granted
+        login_hint : email,       // ← goes straight to the right account
+        callback   : async resp => {
+          if(resp.error || !resp.access_token) return; // silent fail
+          const info = await fetchUserEmail(resp.access_token);
+          await onTokenReceived(resp, info, false);
+        }
+      });
+      tc.requestAccessToken({ prompt: '' });
+    } catch(e){ /* silent fail — user can click Connect manually */ }
+  }
+
+  // Wait for Google Identity Services script to load
+  if(typeof google !== 'undefined' && google.accounts){
+    attempt();
+  } else {
+    let ticks = 0;
+    const t = setInterval(()=>{
+      ticks++;
+      if(typeof google !== 'undefined' && google.accounts){ clearInterval(t); attempt(); }
+      else if(ticks > 50) clearInterval(t); // give up after 10s
+    }, 200);
+  }
+}
+
+// ── Fetch the user's email so we can use login_hint next time ──
+async function fetchUserEmail(token){
+  try{
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const d = await r.json();
+    return d.email || '';
+  } catch(e){ return ''; }
+}
+
+// ── Shared: called whenever we receive a fresh token ──
+async function onTokenReceived(resp, email, showToast){
+  gToken       = resp.access_token;
+  gTokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
+  driveOk      = true;
+  updateDUI(true);
+
+  if(!gFolders.root) await ensureFolders();
+
+  saveDriveSession(gToken, resp.expires_in, email);
+  scheduleTokenRefresh(resp.expires_in);
+
+  if(showToast) toast('✅ Google Drive connected!', 'success');
+}
+
+// ── Manual connect button (user clicks the pill) ──
+async function connectDrive(){
+  if(driveOk){ disconnectDrive(); return; }
+  if(window.location.protocol === 'file:'){ showDriveGuide(); return; }
+  if(typeof google === 'undefined'){ showDriveGuide(); return; }
+  try{
+    const email = getSavedEmail(); // pre-fill account if known
+    const tc = google.accounts.oauth2.initTokenClient({
+      client_id  : GID,
+      scope      : GSCOPE,
+      login_hint : email,   // skips account picker if email known
+      callback   : async resp => {
+        if(resp.error){ toast('Auth failed: ' + resp.error, 'error'); return; }
+        const userEmail = await fetchUserEmail(resp.access_token);
+        await onTokenReceived(resp, userEmail, true);
       }
     });
-    gTC.requestAccessToken({prompt:''});
+    // Only show account picker if we don't know their email yet
+    tc.requestAccessToken({ prompt: email ? '' : 'select_account' });
   } catch(e){ showDriveGuide(); }
 }
+
+// ── Keep token fresh while tab is open ──
+function scheduleTokenRefresh(expiresIn){
+  if(gRefreshTimer) clearTimeout(gRefreshTimer);
+  // Refresh 3 minutes before expiry (tokens last 1 hour)
+  const msUntilRefresh = Math.max((expiresIn - 180) * 1000, 60000);
+  gRefreshTimer = setTimeout(silentRefresh, msUntilRefresh);
+}
+
+function silentRefresh(){
+  if(!driveOk) return;
+  const email = getSavedEmail();
+  try{
+    const tc = google.accounts.oauth2.initTokenClient({
+      client_id  : GID,
+      scope      : GSCOPE,
+      prompt     : '',
+      login_hint : email,
+      callback   : async resp => {
+        if(resp.error || !resp.access_token){ return; } // keep existing token until it dies
+        gToken       = resp.access_token;
+        gTokenExpiry = Date.now() + (resp.expires_in - 120) * 1000;
+        saveDriveSession(gToken, resp.expires_in, email);
+        scheduleTokenRefresh(resp.expires_in);
+      }
+    });
+    tc.requestAccessToken({ prompt: '' });
+  } catch(e){}
+}
+
+// ── Disconnect ──
 function disconnectDrive(){
-  if(gToken) try{google.accounts.oauth2.revoke(gToken);}catch(e){}
-  gToken=null; driveOk=false; gFolders={root:null,restaurant:null,msme:null}; updateDUI(false);
+  if(gRefreshTimer) clearTimeout(gRefreshTimer);
+  if(gToken) try{ google.accounts.oauth2.revoke(gToken); }catch(e){}
+  gToken = null; driveOk = false;
+  gFolders = {root:null, restaurant:null, msme:null};
+  clearDriveSession();
+  updateDUI(false);
   toast('Drive disconnected');
 }
+
 function updateDUI(ok){
-  g('dpill').className='dpill '+(ok?'ok':'');
-  g('ddot').className='ddot '+(ok?'on':'off');
-  g('dlbl').textContent=ok?'✓ Drive Connected':'Connect Google Drive';
+  g('dpill').className  = 'dpill ' + (ok ? 'ok' : '');
+  g('ddot').className   = 'ddot '  + (ok ? 'on' : 'off');
+  g('dlbl').textContent = ok ? '✓ Drive Connected' : 'Connect Google Drive';
 }
 
 async function ensureFolders(){
@@ -1413,53 +1583,126 @@ async function uploadToDrive(file, restName, type='restaurant'){
 // DRIVE GUIDE MODAL
 // ═══════════════════════════════════
 function showDriveGuide(){
-  g('driveGuideBody').innerHTML=`
-    <div class="info-box" style="margin-bottom:1rem;">This CRM is hosted on Vercel/GitHub. To connect Google Drive you need to authorise your Google Cloud project. Here's the exact setup:</div>
+  const origin   = window.location.origin;
+  const isFile   = window.location.protocol === 'file:';
+  const isLocal  = origin.startsWith('http://localhost') || origin.startsWith('http://127.');
+  const isVercel = origin.includes('.vercel.app') || origin.includes('tipplr');
 
-    <div style="font-weight:800;font-size:.88rem;margin-bottom:.5rem;">📋 Step-by-step Google Drive Setup</div>
+  const originWarning = isFile ? `
+    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:10px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-weight:800;color:var(--dan);font-size:.88rem;">🚫 Root Cause of Your Error</div>
+      <div style="font-size:.8rem;margin-top:.4rem;line-height:1.6;">
+        You are opening the file directly from your computer (<code style="background:#fee2e2;padding:.1rem .3rem;border-radius:3px;">file:///...</code>).<br>
+        <b>Google OAuth completely blocks this.</b> It only works when served over HTTP/HTTPS.<br><br>
+        <b>Fix:</b> Don't double-click the file. Instead use one of the two options below ↓
+      </div>
+    </div>` : isVercel ? `
+    <div style="background:#f0fdf9;border:1.5px solid #b0e8d6;border-radius:10px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-weight:800;color:var(--ok);font-size:.88rem;">✅ Your origin looks correct: <code>${origin}</code></div>
+      <div style="font-size:.8rem;margin-top:.3rem;">Make sure this exact URL is in your Authorised JavaScript Origins in Google Cloud (Step 3 below).</div>
+    </div>` : `
+    <div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:10px;padding:1rem;margin-bottom:1rem;">
+      <div style="font-weight:800;color:var(--warn);font-size:.88rem;">⚠️ Current origin: <code>${origin}</code></div>
+      <div style="font-size:.8rem;margin-top:.3rem;">Make sure this exact URL is added to Authorised JavaScript Origins in Google Cloud (Step 3 below).</div>
+    </div>`;
 
-    <div style="display:flex;flex-direction:column;gap:.75rem;font-size:.8rem;line-height:1.6;">
-      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--C);">Step 1 — Google Cloud Console</div>
-        <div>Go to <b>console.cloud.google.com</b> → Create / select your project → Enable <b>Google Drive API</b></div>
-      </div>
-      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--C);">Step 2 — OAuth Consent Screen</div>
-        <div>APIs & Services → OAuth consent screen → External → Add your email as test user → Scopes: <code style="background:#f0edff;padding:.1rem .3rem;border-radius:4px;">.../auth/drive.file</code></div>
-      </div>
-      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--C);">Step 3 — Create OAuth Credentials</div>
-        <div>APIs & Services → Credentials → Create Credentials → OAuth 2.0 Client ID → Web Application<br>
-        <b>Authorised JavaScript origins:</b><br>
-        <code style="background:#f0edff;padding:.1rem .4rem;border-radius:4px;display:block;margin-top:.3rem;">https://your-project.vercel.app</code>
-        <code style="background:#f0edff;padding:.1rem .4rem;border-radius:4px;display:block;margin-top:.25rem;">http://localhost:3000</code>
-        </div>
-      </div>
-      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--C);">Step 4 — Copy Client ID into code</div>
-        <div>In <code>index.html</code>, line 1 of the script section, replace the <code>GID</code> value with your Client ID:<br>
-        <code style="background:#f0edff;padding:.2rem .5rem;border-radius:4px;display:block;margin-top:.3rem;word-break:break-all;">const GID = "YOUR_CLIENT_ID.apps.googleusercontent.com";</code>
-        </div>
-      </div>
-      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--C);">Step 5 — Drive folder structure (auto-created)</div>
-        <div>Once connected, the CRM auto-creates:<br>
-        <code style="background:#f0edff;padding:.2rem .5rem;border-radius:4px;display:block;margin-top:.3rem;">📁 Tipplr_CRM/<br>
-&nbsp;&nbsp;📁 Restaurant_Onboarding/<br>
-&nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/<br>
-&nbsp;&nbsp;📁 MSME_Onboarding/<br>
-&nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/</code>
-        </div>
-      </div>
-      <div style="background:#f0fdf9;border:1px solid #b0e8d6;border-radius:9px;padding:.85rem;">
-        <div style="font-weight:800;color:var(--ok);">✅ Vercel Deploy Notes</div>
-        <div>• Push <code>index.html</code> to GitHub → Connect repo in Vercel<br>
-        • Add your Vercel domain to the <b>Authorised JS origins</b> in Google Cloud<br>
-        • No server needed — everything runs client-side<br>
-        • Data is stored in browser <b>localStorage</b> (use Export CSV to backup)</div>
+  const localOption = `
+    <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+      <div style="font-weight:800;color:var(--C);">Option A — Use Vercel (Recommended, permanent fix)</div>
+      <div style="font-size:.79rem;line-height:1.7;">
+        1. Push <code>index.html</code> to a GitHub repo<br>
+        2. Go to <b>vercel.com</b> → Import that repo → Deploy (free)<br>
+        3. Your URL will be something like <code>https://tipplr-crm.vercel.app</code><br>
+        4. Add that URL to Google Cloud Authorised Origins (Step 3 below)<br>
+        5. Open the Vercel URL in browser → Connect Drive → works permanently ✅
       </div>
     </div>
-    <button class="btn btn-p" style="width:100%;margin-top:1rem;" onclick="closeOv('driveGuideOv');connectDrive();">Try Connect Again</button>`;
+    <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+      <div style="font-weight:800;color:var(--C);">Option B — Quick local test (no Vercel needed)</div>
+      <div style="font-size:.79rem;line-height:1.7;">
+        Open Terminal / Command Prompt in the folder where <code>index.html</code> is saved, then run:<br>
+        <code style="background:#f0edff;padding:.25rem .5rem;border-radius:5px;display:block;margin:.4rem 0;">python3 -m http.server 8080</code>
+        Then open <b>http://localhost:8080</b> in your browser.<br>
+        Add <code>http://localhost:8080</code> to Authorised Origins in Google Cloud.
+      </div>
+    </div>`;
+
+  g('driveGuideBody').innerHTML=`
+    ${originWarning}
+    <div style="font-weight:800;font-size:.9rem;margin-bottom:.75rem;">📋 Complete Setup Checklist</div>
+    <div style="display:flex;flex-direction:column;gap:.7rem;font-size:.79rem;line-height:1.6;">
+
+      ${isFile ? localOption : ''}
+
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 1 — Google Cloud Console</div>
+        <div>
+          → Go to <b><a href="https://console.cloud.google.com" target="_blank" style="color:var(--C);">console.cloud.google.com</a></b><br>
+          → Select or create a project (e.g. "Tipplr CRM")<br>
+          → Left menu: <b>APIs & Services → Library</b><br>
+          → Search <b>Google Drive API</b> → Click it → Click <b>Enable</b>
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 2 — OAuth Consent Screen</div>
+        <div>
+          → APIs & Services → <b>OAuth consent screen</b><br>
+          → User Type: <b>External</b> → Create<br>
+          → App name: <b>Tipplr CRM</b>, fill your email<br>
+          → Scopes → Add scope → search <b>drive.file</b> → tick it → Save<br>
+          → Test users → Add your Gmail address → Save<br>
+          <span style="color:var(--warn);font-weight:700;">⚠️ You MUST add your Gmail as a test user or login will be blocked.</span>
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 3 — Create OAuth 2.0 Credentials</div>
+        <div>
+          → APIs & Services → <b>Credentials</b> → Create Credentials → <b>OAuth client ID</b><br>
+          → Application type: <b>Web application</b><br>
+          → Name: Tipplr CRM<br>
+          → <b>Authorised JavaScript origins</b> — add ALL that apply:<br>
+          <code style="background:#f0edff;padding:.2rem .5rem;border-radius:5px;display:block;margin:.3rem 0;">https://your-project.vercel.app</code>
+          <code style="background:#f0edff;padding:.2rem .5rem;border-radius:5px;display:block;margin:.3rem 0;">http://localhost:8080</code>
+          <code style="background:#f0edff;padding:.2rem .5rem;border-radius:5px;display:block;margin:.3rem 0;">http://localhost:3000</code>
+          <span style="color:var(--dan);font-weight:700;">❌ Do NOT add <code>file://</code> — Google blocks it, always.</span><br>
+          → Leave Redirect URIs blank → Click <b>Create</b><br>
+          → Copy the <b>Client ID</b> (ends in <code>.apps.googleusercontent.com</code>)
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 4 — Paste Client ID into the file</div>
+        <div>
+          → Open <code>index.html</code> in any text editor (Notepad, VS Code)<br>
+          → Press <b>Ctrl+H</b> (Find & Replace)<br>
+          → Find: <code style="word-break:break-all;">20488488150-qh4mpedn2r7bkrafdlmnos1fm2vp2ke9.apps.googleusercontent.com</code><br>
+          → Replace with: your new Client ID<br>
+          → Save → push to GitHub → Vercel redeploys automatically
+        </div>
+      </div>
+
+      <div style="background:var(--s2);border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--C);">Step 5 — Drive folder structure (auto-created on first connect)</div>
+        <div>
+          <code style="background:#f0edff;padding:.3rem .6rem;border-radius:5px;display:block;line-height:2;">
+            📁 Tipplr_CRM/<br>
+            &nbsp;&nbsp;📁 Restaurant_Onboarding/<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/<br>
+            &nbsp;&nbsp;📁 MSME_Onboarding/<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;📁 [Restaurant Name]/
+          </code>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf9;border:1.5px solid #b0e8d6;border-radius:9px;padding:.85rem;">
+        <div style="font-weight:800;color:var(--ok);">✅ Once connected — stays connected</div>
+        <div>Token is saved to localStorage. Auto-restores on page refresh. Auto-refreshes every 55 min. You only need to reconnect if you clear browser data or use a different browser.</div>
+      </div>
+
+    </div>
+    <button class="btn btn-p" style="width:100%;margin-top:1rem;" onclick="closeOv('driveGuideOv');connectDrive();">🔗 Try Connect Now</button>`;
   g('driveGuideOv').classList.add('open');
 }
 
